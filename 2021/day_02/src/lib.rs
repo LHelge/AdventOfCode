@@ -8,7 +8,7 @@ impl TryFrom<&str> for Direction {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let parts = value.trim().split_whitespace().collect::<Vec<&str>>();
+        let parts = value.split_whitespace().collect::<Vec<&str>>();
         if parts.len() != 2 {
             return Err(());
         }
