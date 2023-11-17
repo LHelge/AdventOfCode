@@ -3,20 +3,38 @@ use std::collections::{BTreeSet, HashMap};
 mod valves;
 use valves::{parse_valves, Valve};
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 struct State<'a> {
     position: &'a str,
     time_left: u32,
     opened: BTreeSet<&'a str>,
 }
 
+enum Action<'a> {
+    Open(&'a str),
+    Move(&'a str),
+    None,
+}
+
 // Recursive search algorithm with a HashMap for caching state
 fn max_pressure_released<'a>(
-    state: State<'a>,
+    mut state: State<'a>,
     valves: &HashMap<&str, Valve<'a>>,
     cache: &mut HashMap<State<'a>, u64>,
+    action: &Action<'a>,
 ) -> u64 {
-    // No time left
+    match action {
+        Action::Open(valve) => {
+            state.opened.insert(valve);
+            state.time_left -= 1;
+        }
+        Action::Move(valve) => {
+            state.position = valve;
+            state.time_left -= 1;
+        }
+        Action::None => {}
+    }
+
     if state.time_left == 0 {
         return 0;
     }
@@ -36,17 +54,7 @@ fn max_pressure_released<'a>(
         let max_move = valve
             .tunnels
             .iter()
-            .map(|v| {
-                max_pressure_released(
-                    State {
-                        position: v,
-                        time_left: state.time_left - 1,
-                        opened: state.opened.clone(),
-                    },
-                    valves,
-                    cache,
-                )
-            })
+            .map(|v| max_pressure_released(state.clone(), valves, cache, &Action::Move(v)))
             .max()
             .unwrap();
 
@@ -55,15 +63,8 @@ fn max_pressure_released<'a>(
         if valve.flow_rate > 0 && !state.opened.contains(state.position) {
             let mut opened = state.opened.clone();
             opened.insert(state.position);
-            max_open = max_pressure_released(
-                State {
-                    position: state.position,
-                    time_left: state.time_left - 1,
-                    opened: opened,
-                },
-                valves,
-                cache,
-            );
+            max_open =
+                max_pressure_released(state.clone(), valves, cache, &Action::Open(state.position));
         }
 
         max_left_to_release = max_move.max(max_open);
@@ -98,6 +99,7 @@ fn task1(valves: &Vec<Valve>) -> u64 {
         },
         &valves,
         &mut cache,
+        &Action::None,
     )
 }
 
