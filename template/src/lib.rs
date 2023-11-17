@@ -1,5 +1,5 @@
-pub fn solve_task(input: &str) -> u64 {
-    0
+pub fn solve_task(_input: &str) -> (u64, u64) {
+    (0, 0)
 }
 
 #[cfg(test)]
@@ -10,8 +10,10 @@ mod tests {
     fn example_XXXX_YY() {
         let input = r#""#;
 
-        let result = solve_task(input);
-        assert_eq!(result, 0);
+        let (example1, example2) = solve_task(input);
+
+        assert_eq!(example1, 0);
+        assert_eq!(example2, 0);
     }
 
     #[test]
@@ -23,14 +25,9 @@ mod tests {
         )
         .unwrap();
 
-        let result = solve_task(&input);
+        let (task1, task2) = solve_task(&input);
 
-        // Task 1
-        let task1 = result.clone();
         assert_eq!(task1, 0);
-
-        // Task 2
-        let task2 = result.clone();
         assert_eq!(task2, 0);
     }
 }
