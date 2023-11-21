@@ -64,12 +64,30 @@ pub fn distance_aim(input: &str) -> u32 {
     depth * forward
 }
 
+fn solve_task(input: &str) -> (u32, u32) {
+    (distance(input), distance_aim(input))
+}
+
+fn main() {
+    let input = aoc_input::get_input(
+        2021,
+        2,
+        &std::env::var("SESSION").expect("SESSION environment variable not set"),
+    )
+    .unwrap();
+
+    let (task1, task2) = solve_task(&input);
+
+    println!("Task 1: {}", task1);
+    println!("Task 2: {}", task2);
+}
+
 #[cfg(test)]
-mod tests {
+mod y2021d02 {
     use super::*;
 
     #[test]
-    fn day_02_example() {
+    fn examples() {
         let input = r#"forward 5
         down 5
         forward 8
@@ -77,25 +95,8 @@ mod tests {
         down 8
         forward 2"#;
 
-        let result = distance(input);
-        assert_eq!(result, 150);
-    }
-
-    #[test]
-    fn day_02_tasks() {
-        let input = aoc_input::get_input(
-            2021,
-            2,
-            &std::env::var("SESSION").expect("SESSION environment variable not set"),
-        )
-        .unwrap();
-
-        // Task 1
-        let task1 = distance(&input);
-        assert_eq!(task1, 1499229);
-
-        // Task 2
-        let task2 = distance_aim(&input);
-        assert_eq!(task2, 1340836560);
+        let (example1, example2) = solve_task(input);
+        assert_eq!(example1, 150);
+        assert_eq!(example2, 900);
     }
 }

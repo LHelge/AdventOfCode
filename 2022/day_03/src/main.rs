@@ -6,7 +6,7 @@ fn priority(item: char) -> Option<u64> {
     }
 }
 
-pub fn solve_task(input: &str) -> (u64, u64) {
+fn solve_task(input: &str) -> (u64, u64) {
     let mut result1 = 0;
     let mut result2 = 0;
 
@@ -40,12 +40,26 @@ pub fn solve_task(input: &str) -> (u64, u64) {
     (result1, result2)
 }
 
+fn main() {
+    let input = aoc_input::get_input(
+        2022,
+        3,
+        &std::env::var("SESSION").expect("SESSION environment variable not set"),
+    )
+    .unwrap();
+
+    let (task1, task2) = solve_task(&input);
+
+    println!("Task 1: {}", task1);
+    println!("Task 2: {}", task2);
+}
+
 #[cfg(test)]
-mod tests {
+mod y2022d03 {
     use super::*;
 
     #[test]
-    fn example_2022_03() {
+    fn examples() {
         let input = r#"vJrwpWtwJgWrhcsFMMfFFhFp
         jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
         PmmdzqPrVvPwwTWBwg
@@ -53,26 +67,8 @@ mod tests {
         ttgJtRGJQctTZtZT
         CrZsJsPPZsGzwwsLwLmpwMDw"#;
 
-        let (result1, result2) = solve_task(input);
-        assert_eq!(result1, 157);
-        assert_eq!(result2, 70);
-    }
-
-    #[test]
-    fn tasks_2022_03() {
-        let input = aoc_input::get_input(
-            2022,
-            3,
-            &std::env::var("SESSION").expect("SESSION environment variable not set"),
-        )
-        .unwrap();
-
-        let (task1, task2) = solve_task(&input);
-
-        // Task 1
-        assert_eq!(task1, 7766);
-
-        // Task 2
-        assert_eq!(task2, 2415);
+        let (example1, example2) = solve_task(input);
+        assert_eq!(example1, 157);
+        assert_eq!(example2, 70);
     }
 }

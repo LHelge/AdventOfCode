@@ -101,7 +101,7 @@ impl BingoBoard {
     }
 }
 
-pub fn solve_task(input: &str) -> (u64, u64) {
+fn solve_task(input: &str) -> (u64, u64) {
     let mut lines = input.lines();
 
     let draws: Vec<u8> = lines
@@ -148,12 +148,26 @@ pub fn solve_task(input: &str) -> (u64, u64) {
     (0, 0)
 }
 
+fn main() {
+    let input = aoc_input::get_input(
+        2021,
+        4,
+        &std::env::var("SESSION").expect("SESSION environment variable not set"),
+    )
+    .unwrap();
+
+    let (task1, task2) = solve_task(&input);
+
+    println!("Task 1: {}", task1);
+    println!("Task 2: {}", task2);
+}
+
 #[cfg(test)]
-mod tests {
+mod y2022d04 {
     use super::*;
 
     #[test]
-    fn example_2021_04() {
+    fn examples() {
         let input = r#"7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
         22 13 17 11  0
@@ -174,26 +188,8 @@ mod tests {
         22 11 13  6  5
          2  0 12  3  7"#;
 
-        let (first, last) = solve_task(input);
-        assert_eq!(first, 4512);
-        assert_eq!(last, 1924);
-    }
-
-    #[test]
-    fn tasks_2021_04() {
-        let input = aoc_input::get_input(
-            2021,
-            4,
-            &std::env::var("SESSION").expect("SESSION environment variable not set"),
-        )
-        .unwrap();
-
-        let (first, last) = solve_task(&input);
-
-        // Task 1
-        assert_eq!(first, 29440);
-
-        // Task 2
-        assert_eq!(last, 13884);
+        let (example1, example2) = solve_task(input);
+        assert_eq!(example1, 4512);
+        assert_eq!(example2, 1924);
     }
 }

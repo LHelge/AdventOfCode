@@ -19,6 +19,4 @@ jobs:
     - name: Build
       run: cargo build
     - name: Run tests
-      env: 
-        SESSION: ${{ secrets.SESSION }}
       run: cargo test
