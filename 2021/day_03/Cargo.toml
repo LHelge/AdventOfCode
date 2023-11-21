@@ -1,0 +1,10 @@
+[package]
+name = "y21d03"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+
+[dependencies]
+aoc_input = { path = "../../aoc_input" }
