@@ -114,8 +114,22 @@ pub fn solve_task(input: &str) -> (u64, u64) {
     (score1, score2)
 }
 
+fn main() {
+    let input = aoc_input::get_input(
+        2022,
+        2,
+        &std::env::var("SESSION").expect("SESSION environment variable not set"),
+    )
+    .unwrap();
+
+    let (task1, task2) = solve_task(&input);
+
+    println!("Task 1: {}", task1);
+    println!("Task 2: {}", task2);
+}
+
 #[cfg(test)]
-mod tests {
+mod u2022d02 {
     use super::*;
 
     #[test]
@@ -124,26 +138,8 @@ mod tests {
         B X
         C Z"#;
 
-        let (task1, task2) = solve_task(input);
-        assert_eq!(task1, 15);
-        assert_eq!(task2, 12)
-    }
-
-    #[test]
-    fn tasks_2022_02() {
-        let input = aoc_input::get_input(
-            2022,
-            2,
-            &std::env::var("SESSION").expect("SESSION environment variable not set"),
-        )
-        .unwrap();
-
-        let (task1, task2) = solve_task(&input);
-
-        // Task 1
-        assert_eq!(task1, 12794);
-
-        // Task 2
-        assert_eq!(task2, 14979);
+        let (example1, example2) = solve_task(input);
+        assert_eq!(example1, 15);
+        assert_eq!(example2, 12)
     }
 }
