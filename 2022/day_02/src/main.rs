@@ -133,7 +133,7 @@ mod u2022d02 {
     use super::*;
 
     #[test]
-    fn example_2022_02() {
+    fn examples() {
         let input = r#"A Y
         B X
         C Z"#;

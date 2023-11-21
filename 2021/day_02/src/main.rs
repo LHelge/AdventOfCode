@@ -87,7 +87,7 @@ mod y2021d02 {
     use super::*;
 
     #[test]
-    fn day_02_example() {
+    fn examples() {
         let input = r#"forward 5
         down 5
         forward 8

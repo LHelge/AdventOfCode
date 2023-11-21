@@ -43,7 +43,7 @@ mod y2022d01 {
     use super::*;
 
     #[test]
-    fn example_2022_01() {
+    fn examples() {
         let input = r#"1000
         2000
         3000
