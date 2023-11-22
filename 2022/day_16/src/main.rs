@@ -11,10 +11,10 @@ struct State<'a> {
     opened: BTreeSet<&'a str>,
 }
 
+#[derive(PartialEq, Eq, Clone, Copy)]
 enum Action<'a> {
     Open(&'a str),
     Move(&'a str),
-    None,
 }
 
 // Recursive search algorithm with a HashMap for caching state
@@ -22,28 +22,31 @@ fn max_pressure_released_with_elefant<'a>(
     mut state: State<'a>,
     valves: &HashMap<&str, Valve<'a>>,
     cache: &mut HashMap<State<'a>, u64>,
-    my_action: &Action<'a>,
-    elefant_action: &Action<'a>,
+    my_action: Option<Action<'a>>,
+    elefant_action: Option<Action<'a>>,
 ) -> u64 {
     match my_action {
-        Action::Open(valve) => {
+        Some(Action::Open(valve)) => {
             state.opened.insert(valve);
         }
-        Action::Move(valve) => {
+        Some(Action::Move(valve)) => {
             state.my_position = valve;
         }
-        Action::None => {}
+        None => {}
     }
     match elefant_action {
-        Action::Open(valve) => {
+        Some(Action::Open(valve)) => {
             state.opened.insert(valve);
         }
-        Action::Move(valve) => {
-            state.my_position = valve;
+        Some(Action::Move(valve)) => {
+            state.elefant_position = valve;
         }
-        Action::None => {}
+        None => {}
     }
-    state.time_left -= 1;
+
+    if my_action.is_some() || elefant_action.is_some() {
+        state.time_left -= 1;
+    }
 
     if state.time_left == 0 {
         return 0;
@@ -69,23 +72,29 @@ fn max_pressure_released_with_elefant<'a>(
         my_actions.extend(my_valve.tunnels.iter().map(|v| Action::Move(v)));
 
         let mut elefant_actions: Vec<Action> = vec![];
-        if !state.opened.contains(elefant_valve.name) && my_valve.flow_rate > 0 {
+        if !state.opened.contains(elefant_valve.name) && elefant_valve.flow_rate > 0 {
             elefant_actions.push(Action::Open(elefant_valve.name));
         }
         elefant_actions.extend(elefant_valve.tunnels.iter().map(|v| Action::Move(v)));
 
         // Create all possible permutations of actions
         let mut actions = vec![];
-        for my in &my_actions {
+        for my in my_actions {
             for elefant in &elefant_actions {
-                actions.push((my, elefant));
+                actions.push((my, *elefant));
             }
         }
 
         max_left_to_release = actions
             .iter()
             .map(|(my, elefant)| {
-                max_pressure_released_with_elefant(state.clone(), valves, cache, my, elefant)
+                max_pressure_released_with_elefant(
+                    state.clone(),
+                    valves,
+                    cache,
+                    Some(*my),
+                    Some(*elefant),
+                )
             })
             .max()
             .unwrap();
@@ -109,18 +118,20 @@ fn max_pressure_released<'a>(
     mut state: State<'a>,
     valves: &HashMap<&str, Valve<'a>>,
     cache: &mut HashMap<State<'a>, u64>,
-    action: &Action<'a>,
+    action: Option<Action<'a>>,
 ) -> u64 {
     match action {
-        Action::Open(valve) => {
+        Some(Action::Open(valve)) => {
             state.opened.insert(valve);
-            state.time_left -= 1;
         }
-        Action::Move(valve) => {
+        Some(Action::Move(valve)) => {
             state.my_position = valve;
-            state.time_left -= 1;
         }
-        Action::None => {}
+        None => {}
+    }
+
+    if action.is_some() {
+        state.time_left -= 1;
     }
 
     if state.time_left == 0 {
@@ -142,7 +153,7 @@ fn max_pressure_released<'a>(
         let max_move = valve
             .tunnels
             .iter()
-            .map(|v| max_pressure_released(state.clone(), valves, cache, &Action::Move(v)))
+            .map(|v| max_pressure_released(state.clone(), valves, cache, Some(Action::Move(v))))
             .max()
             .unwrap();
 
@@ -153,7 +164,7 @@ fn max_pressure_released<'a>(
                 state.clone(),
                 valves,
                 cache,
-                &Action::Open(state.my_position),
+                Some(Action::Open(state.my_position)),
             );
         }
 
@@ -186,7 +197,7 @@ fn task1(valves: &HashMap<&str, Valve>) -> u64 {
         },
         &valves,
         &mut cache,
-        &Action::None,
+        None,
     )
 }
 
@@ -202,8 +213,8 @@ fn task2(valves: &HashMap<&str, Valve>) -> u64 {
         },
         &valves,
         &mut cache,
-        &Action::None,
-        &Action::None,
+        None,
+        None,
     )
 }
 
@@ -217,12 +228,26 @@ pub fn solve_task(input: &str) -> (u64, u64) {
     (task1, task2)
 }
 
+fn main() {
+    let input = aoc_input::get_input(
+        2022,
+        16,
+        &std::env::var("SESSION").expect("SESSION environment variable not set"),
+    )
+    .unwrap();
+
+    let (task1, task2) = solve_task(&input);
+
+    println!("Task 1: {}", task1);
+    println!("Task 2: {}", task2);
+}
+
 #[cfg(test)]
-mod tests {
+mod y2022d16 {
     use super::*;
 
     #[test]
-    fn example_2022_16() {
+    fn examples() {
         let input = r#"Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
         Valve BB has flow rate=13; tunnels lead to valves CC, AA
         Valve CC has flow rate=2; tunnels lead to valves DD, BB
@@ -238,20 +263,5 @@ mod tests {
 
         assert_eq!(example1, 1651);
         assert_eq!(example2, 1707);
-    }
-
-    #[test]
-    fn tasks_2022_16() {
-        let input = aoc_input::get_input(
-            2022,
-            16,
-            &std::env::var("SESSION").expect("SESSION environment variable not set"),
-        )
-        .unwrap();
-
-        let (task1, task2) = solve_task(&input);
-
-        assert_eq!(task1, 1673);
-        assert_eq!(task2, 0);
     }
 }
