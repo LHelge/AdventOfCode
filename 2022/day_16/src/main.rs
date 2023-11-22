@@ -184,11 +184,13 @@ fn max_pressure_released<'a>(
     pressure_released_now + max_left_to_release
 }
 
-// Solve part1
-fn task1(valves: &HashMap<&str, Valve>) -> u64 {
+pub fn solve_task(input: &str) -> (u64, u64) {
+    let valves = parse_valves(input).unwrap().1;
+    let valves: HashMap<&str, Valve> = valves.iter().map(|v| (v.name, v.clone())).collect();
+
     let mut cache: HashMap<State, u64> = HashMap::new();
 
-    max_pressure_released(
+    let task1 = max_pressure_released(
         State {
             my_position: "AA",
             elefant_position: "AA",
@@ -198,13 +200,10 @@ fn task1(valves: &HashMap<&str, Valve>) -> u64 {
         &valves,
         &mut cache,
         None,
-    )
-}
+    );
 
-fn task2(valves: &HashMap<&str, Valve>) -> u64 {
-    let mut cache: HashMap<State, u64> = HashMap::new();
-
-    max_pressure_released_with_elefant(
+    cache.clear();
+    let task2 = max_pressure_released_with_elefant(
         State {
             my_position: "AA",
             elefant_position: "AA",
@@ -215,15 +214,7 @@ fn task2(valves: &HashMap<&str, Valve>) -> u64 {
         &mut cache,
         None,
         None,
-    )
-}
-
-pub fn solve_task(input: &str) -> (u64, u64) {
-    let valves = parse_valves(input).unwrap().1;
-    let valves: HashMap<&str, Valve> = valves.iter().map(|v| (v.name, v.clone())).collect();
-
-    let task1 = task1(&valves);
-    let task2 = task2(&valves);
+    );
 
     (task1, task2)
 }
