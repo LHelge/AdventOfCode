@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -10,7 +12,7 @@ use nom::{
 pub struct Valve<'a> {
     pub name: &'a str,
     pub flow_rate: u64,
-    pub tunnels: Vec<&'a str>,
+    pub tunnels: HashMap<&'a str, u64>,
 }
 
 // Parse a specific valve using nom
@@ -31,7 +33,7 @@ fn valve(s: &str) -> IResult<&str, Valve> {
         Valve {
             name,
             flow_rate,
-            tunnels,
+            tunnels: tunnels.iter().map(|t| (*t, 1)).collect(),
         },
     ))
 }
