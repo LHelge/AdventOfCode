@@ -1,13 +1,16 @@
-fn first_string_digit(line: &str) -> Option<(usize, char)> {
-    let numbers = vec![
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    ];
+const DIGITS: [&str; 10] = [
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+];
 
+/// Find the first written digit in the line and return its position and numeric character
+fn first_string_digit(line: &str) -> Option<(usize, char)> {
     let mut found: Option<(usize, char)> = None;
-    for (i, number) in numbers.iter().enumerate() {
+
+    // Go through all digits and find the first one
+    for (i, number) in DIGITS.iter().enumerate() {
         if let Some(pos) = line.find(number) {
             if found.is_none() || pos < found.unwrap().0 {
-                found = Some((pos, ('0' as u8 + i as u8) as char));
+                found = Some((pos, (b'0' + i as u8) as char));
             }
         }
     }
@@ -15,20 +18,20 @@ fn first_string_digit(line: &str) -> Option<(usize, char)> {
     found
 }
 
+/// Find the first numeric digit in the line and return its position and numeric character
 fn first_digit(line: &str) -> Option<(usize, char)> {
     line.chars().enumerate().find(|(_, c)| c.is_numeric())
 }
 
+/// Find the last written digit in the line and return its position and numeric character
 fn last_string_digit(line: &str) -> Option<(usize, char)> {
-    let numbers = vec![
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    ];
-
     let mut found: Option<(usize, char)> = None;
-    for (i, number) in numbers.iter().enumerate() {
+
+    // Go through all digits and find the last one
+    for (i, number) in DIGITS.iter().enumerate() {
         if let Some(pos) = line.rfind(number) {
             if found.is_none() || pos > found.unwrap().0 {
-                found = Some((pos, ('0' as u8 + i as u8) as char));
+                found = Some((pos, (b'0' + i as u8) as char));
             }
         }
     }
@@ -36,6 +39,7 @@ fn last_string_digit(line: &str) -> Option<(usize, char)> {
     found
 }
 
+/// Find the last numeric digit in the line and return its position and numeric character
 fn last_digit(line: &str) -> Option<(usize, char)> {
     if let Some((pos, digit)) = line.chars().rev().enumerate().find(|(_, c)| c.is_numeric()) {
         return Some((line.len() - pos - 1, digit));
@@ -49,17 +53,21 @@ fn solve_task(input: &str) -> (u64, u64) {
     for line in input.lines() {
         let line = line.trim();
 
+        // Find the first and last numeric characters in the line
         let first_digit = first_digit(line);
         let last_digit = last_digit(line);
 
+        // Build a two digit string and parse to sum it for task 1
         let mut number1 = String::new();
         number1.push(first_digit.unwrap_or((0, '0')).1);
         number1.push(last_digit.unwrap_or((0, '0')).1);
         sum1 += number1.parse::<u64>().unwrap();
 
+        // Find the first and last written numbers in the line
         let first_string_digit = first_string_digit(line);
         let last_string_digit = last_string_digit(line);
 
+        // Build a two digit string and parse to sum it for task 2
         let mut number2 = String::new();
         match (first_digit, first_string_digit) {
             (Some((p1, d1)), Some((p2, d2))) => {
@@ -94,7 +102,7 @@ fn solve_task(input: &str) -> (u64, u64) {
 fn main() {
     let input = aoc_input::get_input(
         2023,
-        01,
+        1,
         &std::env::var("SESSION").expect("SESSION environment variable not set"),
     )
     .unwrap();
