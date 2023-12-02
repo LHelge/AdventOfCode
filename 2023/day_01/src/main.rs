@@ -94,7 +94,7 @@ fn solve_task(input: &str) -> (u64, u64) {
 fn main() {
     let input = aoc_input::get_input(
         2023,
-        01,
+        1,
         &std::env::var("SESSION").expect("SESSION environment variable not set"),
     )
     .unwrap();
