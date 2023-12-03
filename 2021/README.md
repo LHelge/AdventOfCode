@@ -8,7 +8,7 @@
 - [Day 4](src/bin/y21d04.rs) - Giant Squid
 - [Day 5](src/bin/y21d05.rs) - Hydrothermal Venture
 - [Day 6](src/bin/y21d06.rs) - Lanternfish
-- Day 7
+- [Day 7](src/bin/y21d07.rs) - The Treachery of Whales
 - Day 8
 - Day 9
 - Day 10
