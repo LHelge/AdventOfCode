@@ -1,16 +1,5 @@
+use aoc::AoCError;
 use std::str::FromStr;
-
-#[derive(Debug)]
-enum AoCError {
-    ParseError,
-    BadInput,
-}
-
-impl From<std::num::ParseIntError> for AoCError {
-    fn from(_: std::num::ParseIntError) -> Self {
-        AoCError::ParseError
-    }
-}
 
 #[derive(Debug, Default)]
 struct Round {
