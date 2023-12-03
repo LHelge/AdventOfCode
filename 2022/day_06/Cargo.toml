@@ -1,7 +1,0 @@
-[package]
-name = "y22d06"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-aoc_input = { path = "../../aoc_input" }
