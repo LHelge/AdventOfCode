@@ -58,7 +58,7 @@ impl Position {
     }
 
     fn blocks_from_origin(&self) -> u32 {
-        self.east.abs() as u32 + self.north.abs() as u32
+        self.east.unsigned_abs() + self.north.unsigned_abs()
     }
 }
 

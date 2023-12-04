@@ -9,7 +9,7 @@ fn solve_task(input: &str) -> (i32, i32) {
             let num = num.parse::<u32>().unwrap() as i32;
             match sign {
                 "+" => num,
-                "-" => num * -1,
+                "-" => -num,
                 _ => panic!("Bad input"),
             }
         })
