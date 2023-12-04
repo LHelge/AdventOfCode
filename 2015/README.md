@@ -3,7 +3,7 @@
 [AoC 2015](https://adventofcode.com/2015/)
 
 - [Day 1](src/bin/y15d01.rs) - Not Quite Lisp
-- Day 2
+- [Day 2](src/bin/y15d02.rs) - I Was Told There Would Be No Math
 - Day 3
 - Day 4
 - Day 5
