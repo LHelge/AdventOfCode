@@ -24,7 +24,7 @@ fn solve_task(input: &str) -> (i32, i32) {
         task2 += cal;
 
         // Bail if there's no end in sight
-        if !visited.insert(task2) || task2.abs() > 1000000 {
+        if !visited.insert(task2) || task2.abs() > 100000 {
             break;
         }
     }
