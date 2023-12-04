@@ -1,5 +1,40 @@
-fn solve_task(_input: &str) -> (u32, u32) {
-    (0, 0)
+use std::collections::BTreeSet;
+
+fn solve_task(input: &str) -> (u32, u32) {
+    let expenses = input
+        .lines()
+        .map(|l| l.trim().parse::<u32>().expect("Bad input"))
+        .collect::<BTreeSet<u32>>();
+
+    let mut task1 = 0;
+    for expense in &expenses {
+        let target = 2020 - expense;
+        if expenses.contains(&target) {
+            task1 = expense * target;
+            break;
+        }
+    }
+
+    let mut task2 = None;
+    for expense1 in &expenses {
+        for expense2 in &expenses {
+            if expense1 == expense2 || expense1 + expense2 > 2020 {
+                continue;
+            }
+
+            let target = 2020 - expense1 - expense2;
+            if expenses.contains(&target) {
+                task2 = Some(expense1 * expense2 * target);
+                break;
+            }
+        }
+
+        if task2.is_some() {
+            break;
+        }
+    }
+
+    (task1, task2.unwrap())
 }
 
 fn main() {
@@ -22,7 +57,14 @@ mod y2021d01 {
 
     #[test]
     fn examples() {
-        let (example1, _) = solve_task("1122");
-        assert_eq!(example1, 0);
+        let input = r#"1721
+979
+366
+299
+675
+1456"#;
+        let (example1, example2) = solve_task(input);
+        assert_eq!(example1, 514579);
+        assert_eq!(example2, 241861950);
     }
 }
