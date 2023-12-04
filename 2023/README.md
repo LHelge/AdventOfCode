@@ -6,7 +6,7 @@
 - [Day 2](src/bin/y23d02.rs) - Cube Conundrum
 - [Day 3](src/bin/y23d03.rs) - Gear Ratios
 - [Day 4](src/bin/y23d04.rs) - Scratchcards
-- Day 5
+- [Day 5](src/bin/y23d05.rs) - ???
 - Day 6
 - Day 7
 - Day 8
