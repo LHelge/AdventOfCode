@@ -72,7 +72,7 @@ fn solve_task(input: &str) -> (u64, u64) {
         .collect::<BTreeMap<usize, Card>>();
 
     let mut task1 = 0;
-    for (_, card) in &base_cards {
+    for card in base_cards.values() {
         let correct = card.winning.intersection(&card.numbers).count();
         if correct > 0 {
             task1 += 2u64.pow(correct as u32 - 1);
@@ -81,7 +81,7 @@ fn solve_task(input: &str) -> (u64, u64) {
 
     let mut task2 = base_cards.len();
     let mut cache: BTreeMap<usize, usize> = BTreeMap::new();
-    for (_, card) in &base_cards {
+    for card in base_cards.values() {
         task2 += number_of_cards_won(card, &base_cards, &mut cache);
     }
 
