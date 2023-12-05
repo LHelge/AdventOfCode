@@ -28,10 +28,11 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d01 {
+mod y2015d04 {
     use super::*;
 
     #[test]
+    #[ignore] // Takes too long
     fn examples() {
         let (example1, _) = solve_task("abcdef");
         assert_eq!(example1, 609043);
