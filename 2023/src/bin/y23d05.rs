@@ -1,8 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    ops::Range,
-    str::FromStr,
-};
+use std::{collections::HashMap, str::FromStr};
 
 use aoc::AoCError;
 
@@ -33,10 +29,18 @@ impl FromStr for Map {
 
 impl Map {
     fn map(&self, input: u64) -> Option<u64> {
-        if input < self.source_start || input >= self.source_start + self.length {
-            None
-        } else {
+        if input >= self.source_start && input < self.source_start + self.length {
             Some(self.destination_start + input.abs_diff(self.source_start))
+        } else {
+            None
+        }
+    }
+
+    fn rmap(&self, output: u64) -> Option<u64> {
+        if output >= self.destination_start && output < self.destination_start + self.length {
+            Some(self.source_start + output.abs_diff(self.destination_start))
+        } else {
+            None
         }
     }
 }
@@ -81,6 +85,14 @@ impl MapGroup {
             .next()
             .unwrap_or(input)
     }
+
+    fn rmap(&self, output: u64) -> u64 {
+        self.maps
+            .iter()
+            .filter_map(|f| f.rmap(output))
+            .next()
+            .unwrap_or(output)
+    }
 }
 
 fn solve_task(input: &str) -> Result<(u64, u64), AoCError> {
@@ -117,28 +129,24 @@ fn solve_task(input: &str) -> Result<(u64, u64), AoCError> {
         task1 = task1.min(location);
     }
 
-    let mut task2 = u64::MAX;
-    let mut visited: HashSet<u64> = HashSet::new();
-    for seed_range in seeds.chunks(2).map(|c| c[0]..(c[0] + c[1])) {
-        println!("\nSeed range: {:?}", seed_range);
-        for seed in seed_range {
-            if visited.contains(&seed) {
-                continue;
-            }
-            visited.insert(seed);
+    let mut task2 = 0;
+    let seed_ranges = seeds
+        .chunks(2)
+        .map(|c| c[0]..(c[0] + c[1]))
+        .collect::<Vec<_>>();
 
-            let soil = map_groups.get("seed").unwrap().map(seed);
-            let fertilizer = map_groups.get("soil").unwrap().map(soil);
-            let water = map_groups.get("fertilizer").unwrap().map(fertilizer);
-            let light = map_groups.get("water").unwrap().map(water);
-            let temperature = map_groups.get("light").unwrap().map(light);
-            let humidity = map_groups.get("temperature").unwrap().map(temperature);
-            let location = map_groups.get("humidity").unwrap().map(humidity);
+    for location in 0..=u64::MAX {
+        let humidity = map_groups.get("humidity").unwrap().rmap(location);
+        let temperature = map_groups.get("temperature").unwrap().rmap(humidity);
+        let light = map_groups.get("light").unwrap().rmap(temperature);
+        let water = map_groups.get("water").unwrap().rmap(light);
+        let fertilizer = map_groups.get("fertilizer").unwrap().rmap(water);
+        let soil = map_groups.get("soil").unwrap().rmap(fertilizer);
+        let seed = map_groups.get("seed").unwrap().rmap(soil);
 
-            //println!("Seed: {}, Soil: {}, Fertilizer: {}, Water: {}, Light: {}, Temperature: {}, Humidity: {}, Location: {}", seed, soil, fertilizer, water, light, temperature, humidity, location);
-
-            task2 = task2.min(location);
-            print!("\r{}", seed);
+        if seed_ranges.iter().any(|r| r.contains(&seed)) {
+            task2 = location;
+            break;
         }
     }
 
