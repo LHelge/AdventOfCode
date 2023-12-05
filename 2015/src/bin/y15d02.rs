@@ -74,7 +74,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d01 {
+mod y2015d02 {
     use super::*;
 
     #[test]

@@ -32,7 +32,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d01 {
+mod y2015d01 {
     use super::*;
 
     #[test]
