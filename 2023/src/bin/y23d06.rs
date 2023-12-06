@@ -3,18 +3,14 @@ fn solve_task(input: &str) -> (usize, usize) {
     let time = lines
         .next()
         .unwrap()
-        .trim()
         .trim_start_matches("Time:")
-        .trim()
         .split_whitespace()
         .map(|t| t.parse::<u64>().unwrap())
         .collect::<Vec<_>>();
     let distance = lines
         .next()
         .unwrap()
-        .trim()
         .trim_start_matches("Distance:")
-        .trim()
         .split_whitespace()
         .map(|t| t.parse::<u64>().unwrap())
         .collect::<Vec<_>>();
@@ -32,7 +28,7 @@ fn solve_task(input: &str) -> (usize, usize) {
         .unwrap()
         .trim()
         .trim_start_matches("Time:")
-        .replace(" ", "")
+        .replace(' ', "")
         .parse::<u64>()
         .unwrap();
 
@@ -41,7 +37,7 @@ fn solve_task(input: &str) -> (usize, usize) {
         .unwrap()
         .trim()
         .trim_start_matches("Distance:")
-        .replace(" ", "")
+        .replace(' ', "")
         .parse::<u64>()
         .unwrap();
 
