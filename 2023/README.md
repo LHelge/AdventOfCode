@@ -7,7 +7,7 @@
 - [Day 3](src/bin/y23d03.rs) - Gear Ratios
 - [Day 4](src/bin/y23d04.rs) - Scratchcards
 - [Day 5](src/bin/y23d05.rs) - If You Give A Seed A Fertilizer
-- Day 6
+- [Day 6](src/bin/y23d06.rs) - Wait For It
 - Day 7
 - Day 8
 - Day 9
