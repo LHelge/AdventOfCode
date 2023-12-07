@@ -1,55 +1,53 @@
-trait Unescape {
+trait MatchstickString {
     fn unescaped_len(&self) -> usize;
+    fn escaped_len(&self) -> usize;
 }
 
-impl Unescape for &str {
+impl MatchstickString for &str {
     fn unescaped_len(&self) -> usize {
-        println!("\n{} : {}", self, self.len());
-        let s = String::from(&self[1..(self.len() - 1)]);
+        let mut chars = self.chars();
+        let mut len = 0;
 
-        let s = s.replace("\\\\", "\\");
-        let mut s = s.replace("\\\"", "\"");
-
-        let hex = s
-            .chars()
-            .collect::<Vec<char>>()
-            .windows(4)
-            .enumerate()
-            .filter_map(|(i, w)| {
-                match (
-                    w[0],
-                    w[1],
-                    u8::from_str_radix(&String::from_iter([w[2], w[3]]), 16),
-                ) {
-                    ('\\', 'x', Ok(c)) => Some((i, c as char)),
-                    _ => None,
-                }
-            })
-            .collect::<Vec<(usize, char)>>();
-
-        for (i, c) in hex.iter().rev() {
-            // Remove the hex escape
-            s.remove(*i);
-            s.remove(*i);
-            s.remove(*i);
-            s.remove(*i);
-            s.insert(*i, *c);
+        while let Some(c) = chars.next() {
+            match c {
+                '\\' => match chars.next().unwrap() {
+                    '\\' => len += 1,
+                    '"' => len += 1,
+                    'x' => {
+                        chars.next();
+                        chars.next();
+                        len += 1;
+                    }
+                    _ => panic!("Invalid escape sequence"),
+                },
+                _ => len += 1,
+            }
         }
 
-        println!("{} : {}", s, s.len());
+        len - 2 // remove the surrounding quotes
+    }
 
-        s.len()
+    fn escaped_len(&self) -> usize {
+        let mut len = 0;
+
+        for c in self.chars() {
+            match c {
+                '\\' => len += 2,
+                '"' => len += 2,
+                _ => len += 1,
+            }
+        }
+
+        len + 2 // add the surrounding quotes
     }
 }
 
 fn solve_task(input: &str) -> (usize, usize) {
-    let task1 = input
-        .trim()
-        .lines()
-        .map(|l| l.len() - l.unescaped_len())
-        .sum();
+    let task1 = input.lines().map(|l| l.len() - l.unescaped_len()).sum();
 
-    (task1, 0)
+    let task2 = input.lines().map(|l| l.escaped_len() - l.len()).sum();
+
+    (task1, task2)
 }
 
 fn main() {
@@ -77,7 +75,24 @@ mod y2015d08 {
 "aaa\"aaa"
 "\x27""#;
 
-        let (example1, _example2) = solve_task(example);
+        let (example1, example2) = solve_task(example);
         assert_eq!(example1, 12);
+        assert_eq!(example2, 19);
+    }
+
+    #[test]
+    fn unescaped() {
+        assert_eq!(r#""""#.unescaped_len(), 0);
+        assert_eq!(r#""abc""#.unescaped_len(), 3);
+        assert_eq!(r#""aaa\"aaa""#.unescaped_len(), 7);
+        assert_eq!(r#""\x27""#.unescaped_len(), 1);
+    }
+
+    #[test]
+    fn escaped() {
+        assert_eq!(r#""""#.escaped_len(), 6);
+        assert_eq!(r#""abc""#.escaped_len(), 9);
+        assert_eq!(r#""aaa\"aaa""#.escaped_len(), 16);
+        assert_eq!(r#""\x27""#.escaped_len(), 11);
     }
 }
