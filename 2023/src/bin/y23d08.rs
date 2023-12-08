@@ -1,3 +1,4 @@
+use num::integer::lcm;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy)]
@@ -69,29 +70,27 @@ fn solve_task(input: &str, solve: Solve) -> (u64, u64) {
 
     // Solve task 2
     if solve == Solve::Task2 || solve == Solve::Both {
-        // find start nodes
-        let mut current_nodes: Vec<&str> = nodes
-            .iter()
-            .filter_map(|(&name, _)| {
-                if name.ends_with('A') {
-                    Some(name)
-                } else {
-                    None
-                }
-            })
-            .collect();
+        task2 = 1; // for LCM to work
+        for start in nodes.iter().filter_map(|(&name, _)| {
+            if name.ends_with('A') {
+                Some(name)
+            } else {
+                None
+            }
+        }) {
+            let mut directions = turns.iter().cycle();
+            let mut current_node = start;
 
-        let mut directions = turns.iter().cycle();
-        while current_nodes.iter().any(|n| !n.ends_with('Z')) {
-            let turn = directions.next().unwrap();
-            for node in current_nodes.iter_mut() {
-                let (left, right) = nodes.get(node).unwrap();
-                *node = match turn {
+            let mut steps = 0;
+            while !current_node.ends_with('Z') {
+                let (left, right) = nodes.get(current_node).unwrap();
+                current_node = match directions.next().unwrap() {
                     Turn::Left => left,
                     Turn::Right => right,
                 };
+                steps += 1;
             }
-            task2 += 1;
+            task2 = lcm(task2, steps);
         }
     }
 
