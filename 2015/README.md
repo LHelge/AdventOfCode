@@ -10,9 +10,9 @@
 - [Day 6](src/bin/y15d06.rs) - Probably a Fire Hazard
 - [Day 7](src/bin/y15d07.rs) - Some Assembly Required
 - [Day 8](src/bin/y15d08.rs) - Matchsticks
-- Day 9
-- Day 10
-- Day 11
+- [Day 9](src/bin/y15d09.rs) - All in a Single Night
+- [Day 10](src/bin/y15d10.rs) - Elves Look, Elves Say
+- [Day 11](src/bin/y15d11.rs) - Corporate Policy
 - Day 12
 - Day 13
 - Day 14
