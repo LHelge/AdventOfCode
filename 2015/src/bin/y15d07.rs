@@ -130,7 +130,7 @@ fn find_signal<'a>(
     };
 
     if let Ok(value) = value {
-        signals.insert(signal.clone(), value);
+        signals.insert(signal, value);
         Ok(value)
     } else {
         value
