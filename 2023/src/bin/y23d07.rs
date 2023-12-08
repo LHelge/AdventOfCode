@@ -175,15 +175,7 @@ fn solve_task(input: &str) -> (u64, u64) {
         .collect();
 
     let mut task2 = 0;
-    for (i, (hand, value)) in hands_with_jokers.iter().enumerate() {
-        let rank = i + 1;
-        println!(
-            "Rank ({:>3} * {:<3}): \t{:?} - {:?}",
-            rank,
-            value,
-            hand.hand_type(),
-            hand.cards
-        );
+    for (i, (_, value)) in hands_with_jokers.iter().enumerate() {
         task2 += value * (i + 1) as u64;
     }
 
