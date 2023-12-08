@@ -9,7 +9,7 @@
 - [Day 5](src/bin/y23d05.rs) - If You Give A Seed A Fertilizer
 - [Day 6](src/bin/y23d06.rs) - Wait For It
 - [Day 7](src/bin/y23d07.rs) - Camel Cards
-- Day 8
+- [Day 8](src/bin/y23d08.rs) - Haunted Wasteland
 - Day 9
 - Day 10
 - Day 11
