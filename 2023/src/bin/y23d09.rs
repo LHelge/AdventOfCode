@@ -11,11 +11,17 @@ fn extrapolate(numbers: &mut Vec<i64>) {
 }
 
 fn solve_task(input: &str) -> (i64, i64) {
-    let (task1, task2) = input.lines().map(|l| {
-        let mut numbers = l.split_whitespace().map(|n| n.parse::<i64>().unwrap()).collect();
-        extrapolate(&mut numbers);
-        (numbers.last().unwrap().clone(), numbers.first().unwrap().clone())
-    }).fold((0, 0), |(t1, t2), (n1, n2) | (t1 + n1, t2 + n2) );
+    let (task1, task2) = input
+        .lines()
+        .map(|l| {
+            let mut numbers = l
+                .split_whitespace()
+                .map(|n| n.parse::<i64>().unwrap())
+                .collect();
+            extrapolate(&mut numbers);
+            (*numbers.last().unwrap(), *numbers.first().unwrap())
+        })
+        .fold((0, 0), |(t1, t2), (n1, n2)| (t1 + n1, t2 + n2));
 
     (task1, task2)
 }
