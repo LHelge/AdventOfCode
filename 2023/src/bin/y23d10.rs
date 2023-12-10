@@ -247,17 +247,8 @@ enum PipeState {
     OnFromSouth,
 }
 
-fn solve_task(input: &str) -> (usize, usize) {
-    let maze: Maze = input.parse().unwrap();
-
-    let maze_loop = maze.iter().collect::<Vec<_>>();
-
-    //dbg!(&maze_loop);
-    let mut new_map: Vec<Vec<Pipe>> = vec![vec![Pipe::Ground; maze.map[0].len()]; maze.map.len()];
-    for (pos, pipe) in maze_loop.iter() {
-        new_map[pos.south][pos.east] = *pipe;
-    }
-    for line in new_map.iter_mut() {
+fn anotate_inside_outside(maze: &mut Vec<Vec<Pipe>>) {
+    for line in maze.iter_mut() {
         let mut pipe_state = PipeState::NotOn;
         let mut inside = false;
         for p in line.iter_mut() {
@@ -298,16 +289,33 @@ fn solve_task(input: &str) -> (usize, usize) {
             }
         }
     }
+}
+
+fn solve_task(input: &str) -> (usize, usize) {
+    let maze: Maze = input.parse().unwrap();
+
+    let maze_loop = maze.iter().collect::<Vec<_>>();
+
+    // Create a new map with only the loop set
+    let mut new_map: Vec<Vec<Pipe>> = vec![vec![Pipe::Ground; maze.map[0].len()]; maze.map.len()];
+    for (pos, pipe) in maze_loop.iter() {
+        new_map[pos.south][pos.east] = *pipe;
+    }
+    // Set the start position
+    new_map[maze.start.south][maze.start.east] = Pipe::Start;
+
+    // Anotate inside and outside
+    anotate_inside_outside(&mut new_map);
 
     // Print maze
-    for line in new_map.iter() {
-        println!(
-            "{}",
-            line.iter()
-                .map(<&Pipe as Into<char>>::into)
-                .collect::<String>()
-        );
-    }
+    // for line in new_map.iter() {
+    //     println!(
+    //         "{}",
+    //         line.iter()
+    //             .map(<&Pipe as Into<char>>::into)
+    //             .collect::<String>()
+    //     );
+    // }
 
     let task1 = maze_loop.len() / 2 + 1;
     let task2 = new_map
