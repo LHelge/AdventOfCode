@@ -8,7 +8,7 @@
 - [Day 4](src/bin/y22d04.rs) - Camp Cleanup
 - [Day 5](src/bin/y22d05.rs) - Supply Stacks
 - [Day 6](src/bin/y22d06.rs) - Tuning Trouble
-- Day 7
+- [Day 7](src/bin/y22d07.rs) - No Space Left On Device
 - Day 8
 - Day 9
 - Day 10
