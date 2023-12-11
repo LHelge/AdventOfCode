@@ -10,9 +10,9 @@
 - [Day 6](src/bin/y23d06.rs) - Wait For It
 - [Day 7](src/bin/y23d07.rs) - Camel Cards
 - [Day 8](src/bin/y23d08.rs) - Haunted Wasteland
-- Day 9
-- Day 10
-- Day 11
+- [Day 9](src/bin/y23d09.rs) - Mirage Maintenance
+- [Day 10](src/bin/y23d10.rs) - Pipe Maze
+- [Day 11](src/bin/y23d11.rs) - Cosmic Expansion
 - Day 12
 - Day 13
 - Day 14
