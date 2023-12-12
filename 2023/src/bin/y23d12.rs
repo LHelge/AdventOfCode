@@ -1,4 +1,5 @@
 use aoc::AoCError;
+use memoize::memoize;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
@@ -42,29 +43,6 @@ impl FromStr for Spring {
 }
 
 impl Spring {
-    fn is_valid(&self) -> bool {
-        let mut sizes: Vec<usize> = Vec::new();
-        let mut size: Option<usize> = None;
-
-        for s in self.states.iter() {
-            match (s, size) {
-                (SpringState::Unknown, _) => return false,
-                (SpringState::Damaged, None) => size = Some(1),
-                (SpringState::Damaged, Some(s)) => size = Some(s + 1),
-                (SpringState::Operational, Some(s)) => {
-                    sizes.push(s);
-                    size = None;
-                }
-                _ => (),
-            }
-        }
-        if let Some(size) = size {
-            sizes.push(size);
-        }
-
-        sizes.eq(&self.counts)
-    }
-
     fn unfold(&mut self) {
         let states = self.states.clone();
         let sizes = self.counts.clone();
@@ -77,40 +55,74 @@ impl Spring {
     }
 }
 
-fn count_correct_arrangements(spring: &Spring) -> usize {
-    // Find first index with unknown state
-    if let Some(idx) = spring
-        .states
-        .iter()
-        .position(|s| *s == SpringState::Unknown)
-    {
-        // Create one version with operational and one with damaged
-        let mut spring1 = spring.clone();
-        spring1.states[idx] = SpringState::Operational;
+fn count_correct_arrangements(states: &[SpringState], counts: &[usize]) -> usize {
+    // If there are no possibly damaged springs left, counts must also be empty
+    let Some(first_state) = states.first() else {
+        if counts.is_empty() {
+            return 1;
+        } else {
+            return 0;
+        }
+    };
 
-        let mut spring2 = spring.clone();
-        spring2.states[idx] = SpringState::Damaged;
+    // If counts is empty, there can not be any damaged springs left
+    let Some(&first_count) = counts.first() else {
+        if states.contains(&SpringState::Damaged) {
+            return 0;
+        } else {
+            return 1;
+        }
+    };
 
-        count_correct_arrangements(&spring1) + count_correct_arrangements(&spring2)
-    } else if spring.is_valid() {
-        1
-    } else {
-        0
+    if counts.len() == 1 && states.len() == first_count {
+        if !states.contains(&SpringState::Operational) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
+
+    let mut arrangements = 0;
+
+    if first_state == &SpringState::Unknown || first_state == &SpringState::Operational {
+        // assume unknown is operational and skip it
+        arrangements += count_correct_arrangements(&states[1..], counts);
+    }
+
+    // Assume start of block (either unknown or damaged)
+    if first_state == &SpringState::Unknown || first_state == &SpringState::Damaged {
+        // assume unknown is damaged
+        if first_count <= states.len()
+            && !states[0..first_count].contains(&SpringState::Operational)
+            && (first_count == states.len() || states[first_count] != SpringState::Damaged)
+        {
+            let skip = if first_count == states.len() {
+                first_count
+            } else {
+                first_count + 1
+            };
+            arrangements += count_correct_arrangements(&states[skip..], &counts[1..]);
+        }
+    }
+
+    arrangements
 }
 
 fn solve_task(input: &str) -> (usize, usize) {
     let mut springs: Vec<Spring> = input.lines().map(|l| l.parse().unwrap()).collect();
 
-    let task1 = springs.iter().map(count_correct_arrangements).sum();
+    let task1 = springs
+        .iter()
+        .map(|s| count_correct_arrangements(&s.states, &s.counts))
+        .sum();
 
+    //let task2 = 0;
     springs.iter_mut().for_each(|s| s.unfold());
-
-    let task2 = 0;
-    //let task2 = springs
-    //    .iter()
-    //    .map(|s| count_correct_arrangements(s, &mut HashMap::new()))
-    //    .sum();
+    let task2 = springs
+        .iter()
+        .map(|s| count_correct_arrangements(&s.states, &s.counts))
+        .inspect(|c| println!("arrangements: {}", c))
+        .sum();
 
     (task1, task2)
 }
@@ -142,9 +154,9 @@ mod y2023d12 {
 ????.######..#####. 1,6,5
 ?###???????? 3,2,1"#;
 
-        let (example1, _example2) = solve_task(example_input);
+        let (example1, example2) = solve_task(example_input);
 
         assert_eq!(example1, 21);
-        //assert_eq!(example2, 525152);
+        assert_eq!(example2, 525152);
     }
 }
