@@ -13,8 +13,8 @@
 - [Day 9](src/bin/y23d09.rs) - Mirage Maintenance
 - [Day 10](src/bin/y23d10.rs) - Pipe Maze
 - [Day 11](src/bin/y23d11.rs) - Cosmic Expansion
-- Day 12
-- Day 13
+- [Day 12](src/bin/y23d12.rs) - Hot Springs
+- [Day 13](src/bin/y23d13.rs) - Point of Incidence
 - Day 14
 - Day 16
 - Day 17
