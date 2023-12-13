@@ -1,28 +1,11 @@
 use aoc::AoCError;
 use memoize::memoize;
+use rayon::prelude::*;
 use std::str::FromStr;
-
-#[derive(Debug, Clone, PartialEq, Hash, Eq)]
-enum SpringState {
-    Unknown,
-    Operational,
-    Damaged,
-}
-
-impl From<char> for SpringState {
-    fn from(c: char) -> Self {
-        match c {
-            '?' => SpringState::Unknown,
-            '.' => SpringState::Operational,
-            '#' => SpringState::Damaged,
-            _ => panic!("Invalid state character"),
-        }
-    }
-}
 
 #[derive(Debug, Clone)]
 struct Spring {
-    states: Vec<SpringState>,
+    states: String,
     counts: Vec<usize>,
 }
 
@@ -32,32 +15,37 @@ impl FromStr for Spring {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (states, counts) = s.split_once(' ').ok_or(AoCError::BadInput)?;
 
-        let states = states.chars().map(SpringState::from).collect();
         let counts = counts
             .split(',')
             .map(|s| s.parse::<usize>().unwrap())
             .collect();
 
-        Ok(Self { states, counts })
+        Ok(Self {
+            states: states.to_owned(),
+            counts,
+        })
     }
 }
 
 impl Spring {
     fn unfold(&mut self) {
-        let states = self.states.clone();
-        let sizes = self.counts.clone();
+        self.states = [
+            self.states.clone(),
+            self.states.clone(),
+            self.states.clone(),
+            self.states.clone(),
+            self.states.clone(),
+        ]
+        .join("?");
 
-        for _ in 0..4 {
-            self.states.push(SpringState::Unknown);
-            self.states.extend(states.iter().cloned());
-            self.counts.extend(sizes.iter().cloned());
-        }
+        self.counts = self.counts.repeat(5);
     }
 }
 
-fn count_correct_arrangements(states: &[SpringState], counts: &[usize]) -> usize {
+#[memoize]
+fn count_correct_arrangements(states: String, counts: Vec<usize>) -> usize {
     // If there are no possibly damaged springs left, counts must also be empty
-    let Some(first_state) = states.first() else {
+    let Some(first_state) = states.chars().next() else {
         if counts.is_empty() {
             return 1;
         } else {
@@ -67,7 +55,7 @@ fn count_correct_arrangements(states: &[SpringState], counts: &[usize]) -> usize
 
     // If counts is empty, there can not be any damaged springs left
     let Some(&first_count) = counts.first() else {
-        if states.contains(&SpringState::Damaged) {
+        if states.contains('#') {
             return 0;
         } else {
             return 1;
@@ -75,7 +63,7 @@ fn count_correct_arrangements(states: &[SpringState], counts: &[usize]) -> usize
     };
 
     if counts.len() == 1 && states.len() == first_count {
-        if !states.contains(&SpringState::Operational) {
+        if !states.contains('.') {
             return 1;
         } else {
             return 0;
@@ -84,24 +72,25 @@ fn count_correct_arrangements(states: &[SpringState], counts: &[usize]) -> usize
 
     let mut arrangements = 0;
 
-    if first_state == &SpringState::Unknown || first_state == &SpringState::Operational {
+    if first_state == '?' || first_state == '.' {
         // assume unknown is operational and skip it
-        arrangements += count_correct_arrangements(&states[1..], counts);
+        arrangements += count_correct_arrangements(states[1..].to_owned(), counts.clone());
     }
 
     // Assume start of block (either unknown or damaged)
-    if first_state == &SpringState::Unknown || first_state == &SpringState::Damaged {
+    if first_state == '?' || first_state == '#' {
         // assume unknown is damaged
         if first_count <= states.len()
-            && !states[0..first_count].contains(&SpringState::Operational)
-            && (first_count == states.len() || states[first_count] != SpringState::Damaged)
+            && !states[0..first_count].contains('.')
+            && (first_count == states.len() || states.chars().nth(first_count) != Some('#'))
         {
             let skip = if first_count == states.len() {
                 first_count
             } else {
                 first_count + 1
             };
-            arrangements += count_correct_arrangements(&states[skip..], &counts[1..]);
+            arrangements +=
+                count_correct_arrangements(states[skip..].to_owned(), counts[1..].to_vec());
         }
     }
 
@@ -113,15 +102,14 @@ fn solve_task(input: &str) -> (usize, usize) {
 
     let task1 = springs
         .iter()
-        .map(|s| count_correct_arrangements(&s.states, &s.counts))
+        .map(|s| count_correct_arrangements(s.states.clone(), s.counts.clone()))
         .sum();
 
     //let task2 = 0;
     springs.iter_mut().for_each(|s| s.unfold());
     let task2 = springs
-        .iter()
-        .map(|s| count_correct_arrangements(&s.states, &s.counts))
-        .inspect(|c| println!("arrangements: {}", c))
+        .par_iter()
+        .map(|s| count_correct_arrangements(s.states.clone(), s.counts.clone()))
         .sum();
 
     (task1, task2)
