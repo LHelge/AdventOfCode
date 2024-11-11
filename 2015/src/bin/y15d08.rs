@@ -1,3 +1,5 @@
+use aoc::AoCInput;
+
 trait MatchstickString {
     fn unescaped_len(&self) -> usize;
     fn escaped_len(&self) -> usize;
@@ -51,12 +53,9 @@ fn solve_task(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2015,
-        8,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2015, 8)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

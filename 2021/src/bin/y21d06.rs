@@ -1,3 +1,5 @@
+use aoc::AoCInput;
+
 fn simulate_fish(initial: &[u64; 9], days: usize) -> u64 {
     let mut current = *initial;
     for _ in 0..days {
@@ -32,12 +34,9 @@ fn solve_task(input: &str) -> (u64, u64) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2021,
-        6,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2021, 6)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

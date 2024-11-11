@@ -1,3 +1,5 @@
+use aoc::AoCInput;
+
 enum Direction {
     Forward(u32),
     Up(u32),
@@ -69,12 +71,9 @@ fn solve_task(input: &str) -> (u32, u32) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2021,
-        2,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2021, 2)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

@@ -1,3 +1,5 @@
+use aoc::AoCInput;
+
 trait NiceString {
     fn is_nice(&self) -> bool;
     fn is_nicer(&self) -> bool;
@@ -40,12 +42,9 @@ fn solve_task(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2015,
-        5,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2015, 5)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

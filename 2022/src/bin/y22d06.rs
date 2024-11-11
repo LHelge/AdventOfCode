@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+use aoc::AoCInput;
+
 fn has_double(signal: &str) -> bool {
     let mut chars = HashSet::new();
     for c in signal.chars() {
@@ -27,12 +29,9 @@ fn solve_task(input: &str) -> (u64, u64) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2022,
-        6,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2022, 6)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

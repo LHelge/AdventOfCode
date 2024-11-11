@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+use aoc::AoCInput;
+
 enum Direction {
     North,
     South,
@@ -62,7 +64,7 @@ fn solve_task(input: &str) -> (usize, usize) {
     santa_position = Position::new();
     houses.insert(Position::new());
     for directions in moves.chunks(2) {
-        if let Some(santas_move) = directions.get(0) {
+        if let Some(santas_move) = directions.first() {
             santa_position.go(santas_move);
             houses.insert(santa_position.clone());
         }
@@ -77,12 +79,9 @@ fn solve_task(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2015,
-        3,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2015, 3)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

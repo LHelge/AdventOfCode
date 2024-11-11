@@ -1,4 +1,6 @@
-fn find_visible(tree_grid: &Vec<Vec<i32>>) -> Vec<Vec<bool>> {
+use aoc::AoCInput;
+
+fn find_visible(tree_grid: &[Vec<i32>]) -> Vec<Vec<bool>> {
     let width = tree_grid[0].len();
     let height = tree_grid.len();
     let mut visible = vec![vec![false; width]; height];
@@ -46,7 +48,7 @@ fn find_visible(tree_grid: &Vec<Vec<i32>>) -> Vec<Vec<bool>> {
     visible
 }
 
-fn scenic_score(tree_grid: &Vec<Vec<i32>>) -> Vec<Vec<u64>> {
+fn scenic_score(tree_grid: &[Vec<i32>]) -> Vec<Vec<u64>> {
     let width = tree_grid[0].len();
     let height = tree_grid.len();
     let mut scores = vec![vec![0; width]; height];
@@ -99,7 +101,7 @@ fn solve_task(input: &str) -> (usize, u64) {
         .map(|line| line.bytes().map(|c| (c - b'0') as i32).collect())
         .collect();
 
-    let visible_trees = find_visible(&tree_grid);
+    let visible_trees = find_visible(tree_grid.as_slice());
     let task1 = visible_trees.iter().flatten().filter(|&&b| b).count();
 
     let scenic_scores = scenic_score(&tree_grid);
@@ -109,12 +111,9 @@ fn solve_task(input: &str) -> (usize, u64) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2022,
-        8,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2022, 8)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

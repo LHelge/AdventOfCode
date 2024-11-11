@@ -1,6 +1,6 @@
 use std::{collections::HashMap, str::FromStr};
 
-use aoc::AoCError;
+use aoc::{AoCError, AoCInput};
 
 #[derive(Debug)]
 enum Operand<'a> {
@@ -161,12 +161,9 @@ fn solve_task(input: &str, signal: &str) -> (u16, u16) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2015,
-        7,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2015, 7)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input, "a");
 

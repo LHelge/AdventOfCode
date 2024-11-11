@@ -1,5 +1,7 @@
 use std::collections::BTreeSet;
 
+use aoc::AoCInput;
+
 fn solve_task(input: &str) -> (i32, i32) {
     let calibrations: Vec<i32> = input
         .trim()
@@ -33,12 +35,9 @@ fn solve_task(input: &str) -> (i32, i32) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2018,
-        1,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2018, 1)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

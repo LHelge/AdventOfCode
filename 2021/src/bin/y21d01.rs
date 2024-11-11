@@ -1,3 +1,5 @@
+use aoc::AoCInput;
+
 fn count_deeper(input: &str) -> usize {
     input
         .lines()
@@ -26,12 +28,9 @@ fn solve_task(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2021,
-        1,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2021, 1)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

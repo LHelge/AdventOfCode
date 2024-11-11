@@ -1,3 +1,5 @@
+use aoc::AoCInput;
+
 /// Calculate the gamma value for the given integers.
 fn calc_gamma_epsilon(integers: &Vec<u64>, bits: usize) -> (u64, u64) {
     let mut columns: Vec<usize> = vec![0; bits];
@@ -60,12 +62,9 @@ fn solve_task(input: &str) -> (u64, u64) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2021,
-        3,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2021, 3)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

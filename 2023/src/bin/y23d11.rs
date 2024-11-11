@@ -1,4 +1,4 @@
-use aoc::Pairable;
+use aoc::{AoCInput, Pairable};
 use std::collections::BTreeSet;
 
 #[derive(Debug, Clone)]
@@ -77,12 +77,9 @@ fn solve_task(input: &str, old_galaxy_factor: usize) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2023,
-        11,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2023, 11)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input, 1000000);
 

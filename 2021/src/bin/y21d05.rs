@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use aoc::AoCInput;
 use nom::{
     bytes::complete::tag,
     character::complete::{line_ending, multispace0},
@@ -77,12 +78,9 @@ fn solve_task(input: &str) -> (u64, u64) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2021,
-        5,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2021, 5)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use aoc::AoCError;
+use aoc::{AoCError, AoCInput};
 
 enum Instruction {
     Noop,
@@ -51,12 +51,9 @@ fn solve_task(input: &str) -> (i32, Vec<i32>) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2022,
-        10,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2022, 10)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

@@ -29,5 +29,9 @@ Your problem input will be fetched automatically and since your input is unique,
 ```bash
 export SESSION=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
+or as a `.env` file containing:
+```
+SESSION=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
 The session token can be found by inspecting the cookies using your browsers developer tools.

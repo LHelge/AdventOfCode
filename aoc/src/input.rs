@@ -1,12 +1,27 @@
+use std::env;
+
 use reqwest::blocking::Client;
 
-pub fn get_input(year: u16, day: u8, session: &str) -> Result<String, reqwest::Error> {
-    let url = format!("https://adventofcode.com/{}/day/{}/input", year, day);
-    let resp = Client::new()
-        .get(url)
-        .header("Cookie", format!("session={}", session))
-        .send()
-        .expect("Failed to fetch input from Advent of Code");
+pub struct AoCInput {
+    session: String,
+}
 
-    Ok(resp.text().expect("Could not get response body"))
+impl AoCInput {
+    pub fn from_env() -> Self {
+        dotenvy::dotenv().ok();
+
+        Self { session: env::var("SESSION").expect("No SESSION environment variable set") }
+    }
+
+    pub fn get_input(&self, year: u16, day: u8) -> reqwest::Result<String> {
+        let url = format!("https://adventofcode.com/{}/day/{}/input", year, day);
+
+        let resp = Client::new()
+            .get(url)
+            .header("Cookie", format!("session={}", self.session))
+            .send()
+            .expect("Failed to fetch input from Advent of Code");
+        
+        Ok(resp.text().expect("Could not get response body"))
+    }
 }

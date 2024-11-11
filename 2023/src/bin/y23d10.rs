@@ -1,4 +1,4 @@
-use aoc::AoCError;
+use aoc::{AoCError, AoCInput};
 use std::str::FromStr;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -319,12 +319,9 @@ fn solve_task(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2023,
-        10,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2023, 10)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 

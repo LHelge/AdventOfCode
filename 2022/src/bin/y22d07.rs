@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 
+use aoc::AoCInput;
+
 #[derive(Debug, Clone)]
 enum Command<'a> {
     Cd(Cd<'a>),
-    Ls(Vec<FsObj<'a>>),
+    Ls(Vec<FsObj>),
 }
 
 #[derive(Debug, Clone)]
@@ -14,9 +16,9 @@ enum Cd<'a> {
 }
 
 #[derive(Debug, Clone)]
-enum FsObj<'a> {
-    File(&'a str, usize),
-    Dir(&'a str),
+enum FsObj {
+    File(usize),
+    Dir,
 }
 
 fn solve_task(input: &str) -> (usize, usize) {
@@ -35,10 +37,10 @@ fn solve_task(input: &str) -> (usize, usize) {
             while lines.peek().is_some() && !lines.peek().unwrap().starts_with("$ ") {
                 let obj = lines.next().unwrap();
                 if obj.starts_with("dir ") {
-                    content.push(FsObj::Dir(&obj[5..]));
+                    content.push(FsObj::Dir);
                 } else {
                     let parts: Vec<&str> = obj.split(' ').collect();
-                    content.push(FsObj::File(parts[1], parts[0].parse().unwrap()));
+                    content.push(FsObj::File(parts[0].parse().unwrap()));
                 }
             }
             commands.push(Command::Ls(content));
@@ -98,12 +100,9 @@ fn solve_task(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2022,
-        7,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2022, 7)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 
