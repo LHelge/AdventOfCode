@@ -5,7 +5,7 @@
 - [Day 1](src/bin/y20d01.rs) - Report Repair
 - [Day 2](src/bin/y20d02.rs) - Password Philosophy
 - [Day 3](src/bin/y20d03.rs) - Toboggan Trajectory
-- Day 4
+- [Day 4](src/bin/y20d04.rs) - Passport Processing
 - Day 5
 - Day 6
 - Day 7
