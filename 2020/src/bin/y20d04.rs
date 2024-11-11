@@ -1,7 +1,62 @@
+use std::collections::HashMap;
+
 use aoc::AoCInput;
 
-fn solve_task(_input: &str) -> (usize, usize) {
-    let task1 = 0;
+#[derive(Debug, Hash, PartialEq, Eq)]
+enum Field {
+    BirthYear,
+    IssueYear,
+    ExpirationYear,
+    Height,
+    HairColor,
+    EyeColor,
+    PassportId,
+    CountryId,
+}
+
+impl From<&str> for Field {
+    fn from(value: &str) -> Self {
+        match value {
+            "byr" => Field::BirthYear,
+            "iyr" => Field::IssueYear,
+            "eyr" => Field::ExpirationYear,
+            "hgt" => Field::Height,
+            "hcl" => Field::HairColor,
+            "ecl" => Field::EyeColor,
+            "pid" => Field::PassportId,
+            "cid" => Field::CountryId,
+            _ => panic!("Bad input!"),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct Passport<'a> {
+    fields: HashMap<Field, &'a str>,
+}
+
+impl<'a> From<&'a str> for Passport<'a> {
+    fn from(value: &'a str) -> Self {
+        let fields = value.split_whitespace().map(|p| {
+            let (key, value) = p.trim().split_once(':').unwrap();
+
+            (key.into(), value)
+        }).collect();
+
+        Self { fields }
+    }
+}
+
+impl Passport<'_> {
+    fn is_valid(&self) -> bool {
+        self.fields.len() == 8 || (self.fields.len() == 7 && !self.fields.contains_key(&Field::CountryId))
+    }
+}
+
+fn solve_task(input: &str) -> (usize, usize) {
+    let passports: Vec<Passport> = input.split("\n\n").map(|p| p.trim().into()).collect();
+
+    let task1 = passports.iter().filter(|p| p.is_valid()).count();
     let task2 = 0;
 
     (task1, task2)
