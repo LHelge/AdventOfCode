@@ -1,4 +1,4 @@
-# Advent of Code 2023
+# Advent of Code 2024
 
 [AoC 2024](https://adventofcode.com/2024/)
 
