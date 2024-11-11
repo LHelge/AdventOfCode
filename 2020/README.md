@@ -3,8 +3,8 @@
 [AoC 2020](https://adventofcode.com/2020/)
 
 - [Day 1](src/bin/y20d01.rs) - Report Repair
-- Day 2
-- Day 3
+- [Day 2](src/bin/y20d02.rs) - Password Philosophy
+- [Day 3](src/bin/y20d03.rs) - Toboggan Trajectory
 - Day 4
 - Day 5
 - Day 6

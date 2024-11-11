@@ -11,6 +11,7 @@ Repository for keeping my [Advent of Code](https://adventofcode.com/) solutions 
  - [2021](2021/README.md)
  - [2022](2022/README.md)
  - [2023](2023/README.md)
+ - [2024](2024/README.md)
 
 
 ## Usage
