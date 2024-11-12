@@ -7,7 +7,7 @@
 - [Day 3](src/bin/y20d03.rs) - Toboggan Trajectory
 - [Day 4](src/bin/y20d04.rs) - Passport Processing
 - [Day 5](src/bin/y20d05.rs) - Binary Boarding
-- Day 6
+- [Day 6](src/bin/y20d06.rs) - Custom Customs
 - Day 7
 - Day 8
 - Day 9
