@@ -78,7 +78,7 @@ fn solve_task(input: &str) -> (usize, usize) {
                 None
             }
         })
-        .unwrap();
+        .unwrap_or_default();
 
     (task1, task2)
 }
@@ -95,7 +95,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d05 {
+mod y2020d05 {
     use super::*;
 
     #[test]
