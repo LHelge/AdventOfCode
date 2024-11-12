@@ -1,5 +1,5 @@
-use std::ops::Add;
 use aoc::AoCInput;
+use std::ops::Add;
 
 #[derive(Debug, Default)]
 struct Position {
@@ -120,7 +120,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d03 {
+mod y2020d03 {
     use super::*;
 
     #[test]

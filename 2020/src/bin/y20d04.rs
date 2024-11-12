@@ -30,15 +30,7 @@ impl From<&str> for Field {
     }
 }
 
-const VALID_EYE_COLORS: [&str; 7] = [
-    "amb",
-    "blu",
-    "brn",
-    "gry",
-    "grn",
-    "hzl",
-    "oth",
-];
+const VALID_EYE_COLORS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 
 impl Field {
     fn is_valid_value(&self, value: &str) -> bool {
@@ -47,7 +39,9 @@ impl Field {
             Field::IssueYear => (2010..=2020).contains(&value.parse().unwrap()),
             Field::ExpirationYear => (2020..=2030).contains(&value.parse().unwrap()),
             Field::Height => Self::is_height_valid(value),
-            Field::HairColor => value.strip_prefix('#').is_some_and(|c| c.chars().all(|c| c.is_ascii_hexdigit())),
+            Field::HairColor => value
+                .strip_prefix('#')
+                .is_some_and(|c| c.chars().all(|c| c.is_ascii_hexdigit())),
             Field::EyeColor => VALID_EYE_COLORS.contains(&value),
             Field::PassportId => value.len() == 9 && value.chars().all(|c| c.is_numeric()),
             Field::CountryId => true,
@@ -60,7 +54,7 @@ impl Field {
                 return (150..=193).contains(&centimeters);
             };
         };
-        
+
         if let Some(inches) = value.strip_suffix("in") {
             if let Ok(inches) = inches.parse::<u16>() {
                 return (59..=76).contains(&inches);
@@ -78,11 +72,14 @@ struct Passport<'a> {
 
 impl<'a> From<&'a str> for Passport<'a> {
     fn from(value: &'a str) -> Self {
-        let fields = value.split_whitespace().map(|p| {
-            let (key, value) = p.trim().split_once(':').unwrap();
+        let fields = value
+            .split_whitespace()
+            .map(|p| {
+                let (key, value) = p.trim().split_once(':').unwrap();
 
-            (key.into(), value)
-        }).collect();
+                (key.into(), value)
+            })
+            .collect();
 
         Self { fields }
     }
@@ -104,9 +101,9 @@ impl Passport<'_> {
     }
 
     fn is_valid2(&self) -> bool {
-        REQUIRED_FIELDS.iter().all(|f| {
-            self.fields.get(f).is_some_and(|&v| f.is_valid_value(v) )
-        })
+        REQUIRED_FIELDS
+            .iter()
+            .all(|f| self.fields.get(f).is_some_and(|&v| f.is_valid_value(v)))
     }
 }
 
@@ -131,7 +128,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d04 {
+mod y2020d04 {
     use super::*;
 
     #[test]

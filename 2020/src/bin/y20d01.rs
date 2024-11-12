@@ -1,5 +1,5 @@
-use std::collections::BTreeSet;
 use aoc::AoCInput;
+use std::collections::BTreeSet;
 
 fn solve_task(input: &str) -> (u32, u32) {
     let expenses = input
@@ -42,7 +42,7 @@ fn main() {
     let input = AoCInput::from_env()
         .get_input(2020, 1)
         .expect("Could not fetch input");
-    
+
     let (task1, task2) = solve_task(&input);
 
     println!("Task 1: {}", task1);
@@ -50,7 +50,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod y2021d01 {
+mod y2020d01 {
     use super::*;
 
     #[test]
