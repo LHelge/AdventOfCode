@@ -9,7 +9,7 @@
 - [Day 5](src/bin/y20d05.rs) - Binary Boarding
 - [Day 6](src/bin/y20d06.rs) - Custom Customs
 - [Day 7](src/bin/y20d07.rs) - Handy Haversacks
-- Day 8
+- [Day 8](src/bin/y20d08.rs) - Handheld Halting
 - Day 9
 - Day 10
 - Day 11
