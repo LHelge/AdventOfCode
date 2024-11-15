@@ -1,22 +1,23 @@
+use std::collections::HashSet;
+
 use aoc::AoCInput;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Instruction {
-    Acc(i32),
-    Jmp(i32),
+    Acc(i64),
+    Jmp(isize),
     Nop,
 }
 
 impl From<&str> for Instruction {
     fn from(value: &str) -> Self {
         let (instruction, data) = value.split_once(' ').unwrap();
-        let data = data.parse().unwrap();
 
         match instruction {
-            "acc" => Instruction::Acc(data),
-            "jmp" => Instruction::Jmp(data),
+            "acc" => Instruction::Acc(data.parse().unwrap()),
+            "jmp" => Instruction::Jmp(data.parse().unwrap()),
             "nop" => Instruction::Nop,
-            _ => panic!("Unknown instruction"),
+            _ => panic!("Unknown instruction: {instruction}"),
         }
     }
 }
@@ -24,7 +25,7 @@ impl From<&str> for Instruction {
 struct Cpu {
     program: Vec<Instruction>,
     pc: usize,
-    acc: i32,
+    acc: i64,
 }
 
 impl Cpu {
@@ -36,27 +37,49 @@ impl Cpu {
         }
     }
 
-    fn step(&mut self) -> (usize, i32) {
-        // TODO
-
-        (self.pc, self.acc)
+    fn step(&mut self) {
+        match self.program[self.pc] {
+            Instruction::Acc(data) => {
+                self.acc += data;
+                self.pc += 1;
+            }
+            Instruction::Jmp(data) => {
+                self.pc = self.pc.wrapping_add_signed(data);
+            }
+            Instruction::Nop => {
+                self.pc += 1;
+            }
+        }
     }
 }
 
-fn solve_task(input: &str) -> (usize, usize) {
+fn task1(program: &[Instruction]) -> i64 {
+    let mut cpu = Cpu::new(Vec::from(program));
+
+    let mut visited = HashSet::new();
+
+    loop {
+        if !visited.insert(cpu.pc) {
+            return cpu.acc;
+        }
+        cpu.step();
+    }
+}
+
+fn solve_task(input: &str) -> (i64, usize) {
     let program = input
         .lines()
         .map(Instruction::from)
         .collect::<Vec<Instruction>>();
 
-    dbg!(program);
+    let task1 = task1(&program);
 
-    (0, 0)
+    (task1, 0)
 }
 
 fn main() {
     let input = AoCInput::from_env()
-        .get_input(2020, 7)
+        .get_input(2020, 8)
         .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
