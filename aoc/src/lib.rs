@@ -1,5 +1,8 @@
+mod code_problem;
+pub use code_problem::*;
+
 mod error;
-pub use error::AoCError;
+pub use error::*;
 
 mod input;
 pub use input::*;
