@@ -1,52 +1,61 @@
-use aoc::AoCInput;
+use aoc::*;
 use std::collections::BTreeSet;
 
-fn solve_task(input: &str) -> (u32, u32) {
-    let expenses = input
-        .lines()
-        .map(|l| l.trim().parse::<u32>().expect("Bad input"))
-        .collect::<BTreeSet<u32>>();
+struct Y2020D01 {
+    expenses: BTreeSet<u64>,
+}
 
-    let mut task1 = 0;
-    for expense in &expenses {
-        let target = 2020 - expense;
-        if expenses.contains(&target) {
-            task1 = expense * target;
-            break;
-        }
+impl CodeProblem for Y2020D01 {
+    fn date() -> (u16, u8) {
+        (2020, 1)
     }
 
-    let mut task2 = None;
-    for expense1 in &expenses {
-        for expense2 in &expenses {
-            if expense1 == expense2 || expense1 + expense2 > 2020 {
-                continue;
-            }
+    fn from_input(input: &str) -> Result<Self> {
+        let expenses = input
+            .lines()
+            .map(|l| l.trim().parse().expect("Bad input"))
+            .collect();
 
-            let target = 2020 - expense1 - expense2;
-            if expenses.contains(&target) {
-                task2 = Some(expense1 * expense2 * target);
+        Ok(Self { expenses })
+    }
+
+    fn task1(&self) -> Result<u64> {
+        let mut task1 = 0;
+        for expense in &self.expenses {
+            let target = 2020 - expense;
+            if self.expenses.contains(&target) {
+                task1 = expense * target;
                 break;
             }
         }
-
-        if task2.is_some() {
-            break;
-        }
+        Ok(task1)
     }
 
-    (task1, task2.unwrap())
+    fn task2(&self) -> Result<u64> {
+        let mut task2 = None;
+        for expense1 in &self.expenses {
+            for expense2 in &self.expenses {
+                if expense1 == expense2 || expense1 + expense2 > 2020 {
+                    continue;
+                }
+
+                let target = 2020 - expense1 - expense2;
+                if self.expenses.contains(&target) {
+                    task2 = Some(expense1 * expense2 * target);
+                    break;
+                }
+            }
+
+            if task2.is_some() {
+                break;
+            }
+        }
+        task2.ok_or(AoCError::Unsolved)
+    }
 }
 
-fn main() {
-    let input = AoCInput::from_env()
-        .get_input(2020, 1)
-        .expect("Could not fetch input");
-
-    let (task1, task2) = solve_task(&input);
-
-    println!("Task 1: {}", task1);
-    println!("Task 2: {}", task2);
+fn main() -> Result<()> {
+    Y2020D01::solve()
 }
 
 #[cfg(test)]
@@ -61,8 +70,9 @@ mod y2020d01 {
 299
 675
 1456"#;
-        let (example1, example2) = solve_task(input);
-        assert_eq!(example1, 514579);
-        assert_eq!(example2, 241861950);
+
+        let problem = Y2020D01::from_input(input).unwrap();
+        assert_eq!(problem.task1().unwrap(), 514579);
+        assert_eq!(problem.task2().unwrap(), 241861950);
     }
 }
