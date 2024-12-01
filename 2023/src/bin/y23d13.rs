@@ -1,6 +1,5 @@
+use aoc::*;
 use std::str::FromStr;
-
-use aoc::AoCError;
 
 #[derive(Debug, Clone)]
 struct Plane {
@@ -90,12 +89,9 @@ fn solve_task(input: &str) -> (usize, u64) {
 }
 
 fn main() {
-    let input = aoc::get_input(
-        2023,
-        13,
-        &std::env::var("SESSION").expect("SESSION environment variable not set"),
-    )
-    .unwrap();
+    let input = AoCInput::from_env()
+        .get_input(2023, 12)
+        .expect("Could not fetch input");
 
     let (task1, task2) = solve_task(&input);
 
