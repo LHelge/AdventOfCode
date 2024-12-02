@@ -9,3 +9,6 @@ pub use pairs::Pairable;
 
 mod permute;
 pub use permute::Permutable;
+
+mod solution;
+pub use solution::*;
