@@ -2,8 +2,8 @@
 
 [AoC 2024](https://adventofcode.com/2024/)
 
-- [Day 1](src/bin/y24d01.rs)
-- Day 2
+- [Day 1](src/bin/y24d01.rs) - Historian Hysteria
+- [Day 2](src/bin/y24d02.rs) - Red-Nosed Reports
 - Day 3
 - Day 4
 - Day 5
