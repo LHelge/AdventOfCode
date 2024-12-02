@@ -78,6 +78,7 @@ fn solve_task(input: &str, old_galaxy_factor: usize) -> (usize, usize) {
 
 fn main() {
     let input = AoCInput::from_env()
+        .expect("SESSION env variable not found")
         .get_input(2023, 11)
         .expect("Could not fetch input");
 

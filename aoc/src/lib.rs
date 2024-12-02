@@ -1,14 +1,14 @@
 mod error;
-pub use error::AoCError;
+pub use error::*;
 
 mod input;
 pub use input::*;
 
 mod pairs;
-pub use pairs::Pairable;
+pub use pairs::*;
 
 mod permute;
-pub use permute::Permutable;
+pub use permute::*;
 
 mod solution;
 pub use solution::*;

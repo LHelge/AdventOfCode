@@ -38,6 +38,7 @@ fn solve_task(input: &str) -> (u64, u64) {
 
 fn main() {
     let input = AoCInput::from_env()
+        .expect("SESSION env variable not found")
         .get_input(2021, 7)
         .expect("Could not fetch input");
 
