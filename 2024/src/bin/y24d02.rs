@@ -1,22 +1,39 @@
-use aoc::*;
+const YEAR: u16 = 2024;
+const DAY: u8 = 2;
+
 use std::num::ParseIntError;
+
+use aoc::*;
 
 struct Report {
     levels: Vec<u64>,
 }
 
 impl TryFrom<&str> for Report {
-    type Error = ParseIntError;
+    type Error = AoCError;
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+    fn try_from(value: &str) -> Result<Self> {
         let levels = value
             .split(' ')
             .map(|level| level.parse())
-            .collect::<Result<Vec<u64>, ParseIntError>>()?;
+            .collect::<std::result::Result<Vec<u64>, ParseIntError>>()?;
 
         Ok(Self { levels })
     }
 }
+
+//impl TryFrom<&str> for Report {
+//    type Error = AoCError;
+//
+//    fn try_from(value: &str) -> Result<Self> {
+//        let levels = value
+//            .split(' ')
+//            .map(|level| level.parse().map_err(|e: ParseIntError| e.into()))
+//            .collect::<Result<Vec<u64>>>()?;
+//
+//        Ok(Self { levels })
+//    }
+//}
 
 impl Report {
     fn clone_reduced(&self, index: usize) -> Self {
@@ -50,26 +67,27 @@ impl Report {
     }
 }
 
-fn parse(input: &str) -> Vec<Report> {
+type ResultType = usize;
+type DataType = Vec<Report>;
+
+fn parse(input: &str) -> Result<DataType> {
     input
         .lines()
         .map(Report::try_from)
-        .collect::<Result<Vec<Report>, ParseIntError>>()
-        .unwrap()
+        .collect::<Result<Vec<Report>>>()
 }
 
-fn task1(reports: &[Report]) -> usize {
-    reports.iter().filter(|r| r.safe()).count()
+fn task1(data: &DataType) -> Result<ResultType> {
+    Ok(data.iter().filter(|r| r.safe()).count())
 }
 
-fn task2(reports: &[Report]) -> usize {
-    reports.iter().filter(|r| r.safe_damped()).count()
+fn task2(data: &DataType) -> Result<ResultType> {
+    Ok(data.iter().filter(|r| r.safe_damped()).count())
 }
 
-fn main() -> Result<(), ParseIntError> {
-    let mut solution = Solution::<usize, Report>::new(2024, 2, &parse, &task1, &task2);
-    solution.solve_live();
-
+fn main() -> Result<()> {
+    let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
+    solution.solve_for_answer(YEAR, DAY)?;
     println!("{solution}");
 
     Ok(())
@@ -88,9 +106,9 @@ mod y2024d02 {
 8 6 4 4 1
 1 3 6 7 9"#;
 
-        let mut solution = Solution::<usize, Report>::new(2024, 2, &parse, &task1, &task2);
-        solution.solve(input);
-        assert_eq!(solution.task1().unwrap(), 2);
-        assert_eq!(solution.task2().unwrap(), 4);
+        let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
+        let (task1, task2) = solution.solve_for_test(input).unwrap();
+        assert_eq!(task1, Some(2));
+        assert_eq!(task2, Some(4));
     }
 }
