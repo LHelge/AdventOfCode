@@ -4,8 +4,8 @@
 
 - [Day 1](src/bin/y24d01.rs) - Historian Hysteria
 - [Day 2](src/bin/y24d02.rs) - Red-Nosed Reports
-- Day 3
-- Day 4
+- [Day 3](src/bin/y24d03.rs) - Mull It Over
+- [Day 4](src/bin/y24d04.rs) - 
 - Day 5
 - Day 6
 - Day 7
