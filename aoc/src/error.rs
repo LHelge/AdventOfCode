@@ -14,6 +14,7 @@ pub enum AoCError {
     Unsolved,
     EnvironmentVariable(std::env::VarError),
     FetchInput(String),
+    Parser,
 }
 
 impl Display for AoCError {
@@ -29,6 +30,7 @@ impl Display for AoCError {
             AoCError::Unsolved => write!(f, "Task not solved yet"),
             AoCError::EnvironmentVariable(e) => write!(f, "Environment variable error: {e}"),
             AoCError::FetchInput(msg) => write!(f, "Could not fetch input: {msg}"),
+            AoCError::Parser => write!(f, "Parser error"),
         }
     }
 }
@@ -56,5 +58,11 @@ impl From<reqwest::Error> for AoCError {
 impl From<std::env::VarError> for AoCError {
     fn from(e: std::env::VarError) -> Self {
         AoCError::EnvironmentVariable(e)
+    }
+}
+
+impl<I> From<nom::error::Error<I>> for AoCError {
+    fn from(_: nom::error::Error<I>) -> Self {
+        AoCError::Parser
     }
 }

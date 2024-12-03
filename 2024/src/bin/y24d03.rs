@@ -1,7 +1,13 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 3;
 use aoc::*;
-use nom::{branch::alt, bytes::complete::tag, IResult};
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::anychar,
+    multi::{many1, many_till},
+    Finish, IResult, Parser,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Instruction {
@@ -38,16 +44,7 @@ type ResultType = u64;
 type DataType = Vec<Instruction>;
 
 fn parse(input: &str) -> Result<DataType> {
-    let mut data = vec![];
-
-    // Ugly way to parse all the data
-    for i in 0..input.len() {
-        if let Ok((_, m)) = instruction(&input[i..]) {
-            data.push(m);
-        }
-    }
-
-    dbg!(&data);
+    let (_, data) = many1(many_till(anychar, instruction).map(|(_, i)| i))(input).finish()?;
 
     Ok(data)
 }
