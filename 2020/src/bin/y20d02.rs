@@ -34,7 +34,7 @@ impl<'a> From<&'a str> for Password<'a> {
     }
 }
 
-impl<'a> Password<'a> {
+impl Password<'_> {
     fn is_valid1(&self) -> bool {
         let num = self
             .password

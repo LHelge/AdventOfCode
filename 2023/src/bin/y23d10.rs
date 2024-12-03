@@ -187,7 +187,7 @@ struct MazeWalker<'a> {
     prev_position: Option<Position>,
 }
 
-impl<'a> Iterator for MazeWalker<'a> {
+impl Iterator for MazeWalker<'_> {
     type Item = (Position, Pipe);
 
     fn next(&mut self) -> Option<Self::Item> {
