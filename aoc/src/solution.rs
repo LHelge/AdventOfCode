@@ -108,7 +108,7 @@ where
     T: Copy,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Parsed items: {}", self.parse)?;
+        writeln!(f, "{}", self.parse)?;
         writeln!(f, "Task 1: {}", self.task1)?;
         writeln!(f, "Task 2: {}", self.task2)
     }
