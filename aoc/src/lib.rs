@@ -1,14 +1,10 @@
 mod error;
-pub use error::*;
-
 mod input;
-pub use input::*;
-
-mod pairs;
-pub use pairs::*;
-
-mod permute;
-pub use permute::*;
-
+pub mod pairs;
+pub mod permute;
 mod solution;
+pub mod vec2d;
+
+pub use error::*;
+pub use input::*;
 pub use solution::*;

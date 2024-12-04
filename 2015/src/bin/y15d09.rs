@@ -1,4 +1,4 @@
-use aoc::{AoCInput, Permutable};
+use aoc::{permute::Permutable, AoCInput};
 use std::collections::{HashMap, HashSet};
 
 fn solve_task(input: &str) -> (u64, u64) {

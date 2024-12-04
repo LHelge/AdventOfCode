@@ -15,6 +15,7 @@ pub enum AoCError {
     EnvironmentVariable(std::env::VarError),
     FetchInput(String),
     Parser,
+    Vec2d(crate::vec2d::Error),
 }
 
 impl Display for AoCError {
@@ -31,6 +32,7 @@ impl Display for AoCError {
             AoCError::EnvironmentVariable(e) => write!(f, "Environment variable error: {e}"),
             AoCError::FetchInput(msg) => write!(f, "Could not fetch input: {msg}"),
             AoCError::Parser => write!(f, "Parser error"),
+            AoCError::Vec2d(e) => write!(f, "Vec2d error: {e}"),
         }
     }
 }
@@ -64,5 +66,11 @@ impl From<std::env::VarError> for AoCError {
 impl<I> From<nom::error::Error<I>> for AoCError {
     fn from(_: nom::error::Error<I>) -> Self {
         AoCError::Parser
+    }
+}
+
+impl From<crate::vec2d::Error> for AoCError {
+    fn from(e: crate::vec2d::Error) -> Self {
+        AoCError::Vec2d(e)
     }
 }
