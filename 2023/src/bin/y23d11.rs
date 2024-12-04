@@ -1,4 +1,4 @@
-use aoc::{AoCInput, Pairable};
+use aoc::{pairs::Pairable, AoCInput};
 use std::collections::BTreeSet;
 
 #[derive(Debug, Clone)]
