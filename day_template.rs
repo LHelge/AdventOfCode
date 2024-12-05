@@ -27,7 +27,7 @@ fn main() -> Result<()> {
 }
 
 #[cfg(test)]
-mod y2024d02 {
+mod tests {
     use super::*;
 
     #[test]
