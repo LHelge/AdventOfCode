@@ -92,14 +92,14 @@ fn task1(data: &DataType) -> Result<ResultType> {
 
 fn task2(data: &DataType) -> Result<ResultType> {
     // Brute force through all possible new obstructions
-    let task2 = data.map.size().par_iter().filter(|&pos| {
+    let task2 = data.map.size().iter().collect::<Vec<Position>>().par_iter().filter(|&pos| {
         // Skip if there's already an obstruction
-        if matches!(data.map.get(pos), Some(MapPoint::Obstruction)) {
+        if matches!(data.map.get(*pos), Some(MapPoint::Obstruction)) {
             return false;
         }
 
         let mut data = data.clone();
-        data.map.set(pos, MapPoint::Obstruction).ok();
+        data.map.set(*pos, MapPoint::Obstruction).ok();
 
         let mut visited: HashSet<Guard> = HashSet::new();
 
