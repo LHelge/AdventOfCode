@@ -1,6 +1,5 @@
 use std::{
-    fmt::Display,
-    ops::{Add, Mul, Sub},
+    fmt::Display, iter::Flatten, ops::{Add, Mul, Sub}, slice
 };
 use strum::EnumIter;
 
@@ -71,7 +70,7 @@ impl Iterator for SizeIter {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Position {
     pub x: usize,
     pub y: usize,
@@ -102,6 +101,10 @@ impl Sub<Position> for Position {
 impl Position {
     pub fn new(x: usize, y: usize) -> Self {
         Self { x, y }
+    }
+
+    pub fn is_inside(&self, size: Size) -> bool {
+        self.x < size.width && self.y < size.height
     }
 }
 
@@ -155,7 +158,7 @@ impl Distance {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, Hash)]
 pub enum Direction {
     North,
     NorthEast,
@@ -165,6 +168,34 @@ pub enum Direction {
     SouthWest,
     West,
     NorthWest,
+}
+
+impl Direction {
+    pub fn turn_cv(&self) -> Direction {
+        match self {
+            Self::North => Direction::NorthEast,
+            Self::NorthEast => Direction::East,
+            Self::East => Direction::SouthEast,
+            Self::SouthEast => Direction::South,
+            Self::South => Direction::SouthWest,
+            Self::SouthWest => Direction::West,
+            Self::West => Direction::NorthWest,
+            Self::NorthWest => Direction::North,
+        }
+    }
+
+    pub fn turn_ccv(&self) -> Direction {
+        match self {
+            Self::North => Direction::NorthWest,
+            Self::NorthEast => Direction::North,
+            Self::East => Direction::NorthEast,
+            Self::SouthEast => Direction::East,
+            Self::South => Direction::SouthEast,
+            Self::SouthWest => Direction::South,
+            Self::West => Direction::SouthWest,
+            Self::NorthWest => Direction::West,
+        }
+    }
 }
 
 /// A 2D vector that can be indexed with a `Position` struct.
@@ -210,6 +241,31 @@ impl<T> Vec2d<T> {
     pub fn get(&self, pos: Position) -> Option<&T> {
         self.data.get(pos.y)?.get(pos.x)
     }
+
+    pub fn set(&mut self, pos: Position, item: T) -> Result<(), Error> {
+        if !pos.is_inside(self.size) {
+            return Err(Error::OutOfBounds);
+        }
+
+        self.data[pos.y][pos.x] = item;
+        Ok(())
+    }
+
+    pub fn flatten(&self) -> Flatten<slice::Iter<'_, Vec<T>>> {
+        self.data.iter().flatten()
+    }
+
+    pub fn find(&self, item: &T) -> Option<(Position, &T)> where T: Eq{
+        for p in self.size().iter() {
+            if let Some(i) = self.get(p) {
+                if item == i {
+                    return Some((p, i));
+                }
+            }
+        }
+        None
+    }
+
 }
 
 #[cfg(test)]
