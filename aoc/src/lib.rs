@@ -1,5 +1,6 @@
 mod error;
 mod input;
+pub mod multiset;
 pub mod pairs;
 pub mod permute;
 mod solution;
