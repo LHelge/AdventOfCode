@@ -1,5 +1,8 @@
 use std::{
-    fmt::Display, iter::Flatten, ops::{Add, Mul, Sub}, slice
+    fmt::Display,
+    iter::Flatten,
+    ops::{Add, Mul, Sub},
+    slice,
 };
 use strum::EnumIter;
 
@@ -70,10 +73,16 @@ impl Iterator for SizeIter {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Position {
     pub x: usize,
     pub y: usize,
+}
+
+impl Display for Position {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
 }
 
 impl Add<Distance> for Position {
@@ -83,6 +92,17 @@ impl Add<Distance> for Position {
         Self {
             x: self.x.wrapping_add_signed(distance.dx),
             y: self.y.wrapping_add_signed(distance.dy),
+        }
+    }
+}
+
+impl Sub<Distance> for Position {
+    type Output = Self;
+
+    fn sub(self, distance: Distance) -> Self {
+        Self {
+            x: self.x.wrapping_add_signed(-distance.dx),
+            y: self.y.wrapping_add_signed(-distance.dy),
         }
     }
 }
@@ -255,7 +275,10 @@ impl<T> Vec2d<T> {
         self.data.iter().flatten()
     }
 
-    pub fn find(&self, item: &T) -> Option<(Position, &T)> where T: Eq{
+    pub fn find(&self, item: &T) -> Option<(Position, &T)>
+    where
+        T: Eq,
+    {
         for p in self.size().iter() {
             if let Some(i) = self.get(p) {
                 if item == i {
@@ -266,6 +289,52 @@ impl<T> Vec2d<T> {
         None
     }
 
+    pub fn iter(&self) -> Vec2dIter<'_, T> {
+        Vec2dIter {
+            vec2d: self,
+            current: Position::new(0, 0),
+        }
+    }
+}
+
+pub struct Vec2dIter<'a, T> {
+    vec2d: &'a Vec2d<T>,
+    current: Position,
+}
+
+impl<'a, T> Iterator for Vec2dIter<'a, T> {
+    type Item = (Position, &'a T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current.y < self.vec2d.height() {
+            let pos = self.current;
+            self.current.x += 1;
+
+            if self.current.x >= self.vec2d.width() {
+                self.current.x = 0;
+                self.current.y += 1;
+            }
+
+            Some((pos, self.vec2d.get(pos).unwrap()))
+        } else {
+            None
+        }
+    }
+}
+
+impl<T> Display for Vec2d<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        for row in &self.data {
+            for item in row {
+                write!(f, "{}", item)?;
+            }
+            writeln!(f)?;
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]
