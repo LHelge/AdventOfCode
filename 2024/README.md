@@ -6,15 +6,15 @@
 - [Day 2](src/bin/y24d02.rs) - Red-Nosed Reports
 - [Day 3](src/bin/y24d03.rs) - Mull It Over
 - [Day 4](src/bin/y24d04.rs) - Ceres Search
-- [Day 5](src/bin/y24d05.rs) - 
-- Day 6
-- Day 7
-- Day 8
-- Day 9
-- Day 10
-- Day 11
-- Day 12
-- Day 13
+- [Day 5](src/bin/y24d05.rs) - Print Queue
+- [Day 6](src/bin/y24d06.rs) - Guard Gallivant
+- [Day 7](src/bin/y24d07.rs) - Bridge Repair
+- [Day 8](src/bin/y24d08.rs) - Resonant Collinearity
+- [Day 9](src/bin/y24d09.rs) - Disk Fragmenter
+- [Day 10](src/bin/y24d10.rs) - Hoof It
+- [Day 11](src/bin/y24d11.rs) - Plutonian Pebbles
+- [Day 12](src/bin/y24d12.rs) - Garden Groups
+- [Day 13](src/bin/y24d13.rs) - Claw Contraption
 - Day 14
 - Day 16
 - Day 17
