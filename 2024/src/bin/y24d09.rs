@@ -20,7 +20,7 @@ impl HashChecksum for Vec<DiskEntity> {
                         checksum += block * id;
                         block += 1;
                     }
-                },
+                }
                 DiskEntity::Space { space } => {
                     block += space;
                 }
@@ -33,32 +33,14 @@ impl HashChecksum for Vec<DiskEntity> {
 
 #[derive(Debug, Clone, Copy)]
 enum DiskEntity {
-    Space{space: usize},
-    File{ size: usize, id: usize}
+    Space { space: usize },
+    File { size: usize, id: usize },
 }
 
 impl DiskEntity {
     fn is_space(&self) -> bool {
         matches!(self, DiskEntity::Space { space: _ })
     }
-}
-
-fn print_disk(disk: &[DiskEntity]) {
-    for de in disk.iter() {
-        match *de {
-            DiskEntity::File { size, id } => {
-                for _ in 0..size {
-                    print!("{id}");
-                }
-            },
-            DiskEntity::Space { space } => {
-                for _ in 0..space {
-                    print!(".");
-                }
-            }
-        }
-    }
-    println!();
 }
 
 type ResultType = usize;
@@ -103,25 +85,45 @@ fn task1(data: &DataType) -> Result<ResultType> {
                                 disk.remove(index);
                                 disk.insert(index, DiskEntity::File { size: space, id });
                                 size_left -= space;
-                            },
+                            }
                             Ordering::Greater => {
                                 // Space is larger than file, replace part of it
                                 disk.remove(index);
-                                disk.insert(index, DiskEntity::File { size: size_left, id });
-                                disk.insert(index+1, DiskEntity::Space { space: space - size_left });
+                                disk.insert(
+                                    index,
+                                    DiskEntity::File {
+                                        size: size_left,
+                                        id,
+                                    },
+                                );
+                                disk.insert(
+                                    index + 1,
+                                    DiskEntity::Space {
+                                        space: space - size_left,
+                                    },
+                                );
                                 size_left = 0;
                             }
                             Ordering::Equal => {
-                                 //space and file are same size, replace it
-                            disk.remove(index);
-                            disk.insert(index, DiskEntity::File { size: size_left, id });
-                            size_left = 0;
+                                //space and file are same size, replace it
+                                disk.remove(index);
+                                disk.insert(
+                                    index,
+                                    DiskEntity::File {
+                                        size: size_left,
+                                        id,
+                                    },
+                                );
+                                size_left = 0;
                             }
                         }
                     }
                 } else {
                     // No free space left, put last.
-                    disk.push(DiskEntity::File { size: size_left, id});
+                    disk.push(DiskEntity::File {
+                        size: size_left,
+                        id,
+                    });
                     size_left = 0;
                 };
             }
@@ -134,18 +136,25 @@ fn task1(data: &DataType) -> Result<ResultType> {
 fn task2(data: &DataType) -> Result<ResultType> {
     let mut disk = data.clone();
 
-    let mut ids = disk.iter().filter_map(|&de| {
-        match de {
+    let mut ids = disk
+        .iter()
+        .filter_map(|&de| match de {
             DiskEntity::File { size: _, id } => Some(id),
             _ => None,
-        }
-    }).collect::<Vec<usize>>();
+        })
+        .collect::<Vec<usize>>();
     ids.sort();
 
     for &move_id in ids.iter().rev() {
-        if let Some(index) = disk.iter().position(|de| matches!(de, DiskEntity::File { size: _, id } if id == &move_id)) {
+        if let Some(index) = disk
+            .iter()
+            .position(|de| matches!(de, DiskEntity::File { size: _, id } if id == &move_id))
+        {
             if let DiskEntity::File { size, id } = disk[index] {
-                if let Some(free_index) = disk.iter().position(|de| matches!(de, DiskEntity::Space { space } if space >= &size)) {
+                if let Some(free_index) = disk
+                    .iter()
+                    .position(|de| matches!(de, DiskEntity::Space { space } if space >= &size))
+                {
                     if free_index < index {
                         //println!("{index} <-> {free_index}");
 
@@ -155,18 +164,23 @@ fn task2(data: &DataType) -> Result<ResultType> {
                             match space.cmp(&size) {
                                 Ordering::Greater => {
                                     disk.insert(free_index, DiskEntity::File { size, id });
-                                    disk.insert(free_index+1, DiskEntity::Space { space: space - size });
-                                },
+                                    disk.insert(
+                                        free_index + 1,
+                                        DiskEntity::Space {
+                                            space: space - size,
+                                        },
+                                    );
+                                }
                                 Ordering::Equal => {
                                     disk.insert(free_index, DiskEntity::File { size, id });
-                                },
+                                }
                                 Ordering::Less => unreachable!(),
                             }
                         }
 
                         //print_disk(&disk);
                     }
-                } 
+                }
             }
         }
     }
