@@ -5,6 +5,13 @@ use std::collections::HashSet;
 use aoc::*;
 use vec2d::{Direction, Position, Vec2d};
 
+const DIRECTIONS: [Direction; 4] = [
+    Direction::North,
+    Direction::East,
+    Direction::South,
+    Direction::West,
+];
+
 struct Region {
     id: char,
     positions: HashSet<Position>,
@@ -31,13 +38,6 @@ impl Region {
     }
 
     fn perimeter(&self) -> usize {
-        const DIRECTIONS: [Direction; 4] = [
-            Direction::North,
-            Direction::East,
-            Direction::South,
-            Direction::West,
-        ];
-
         let mut perimeter = 0;
         for &position in self.positions.iter() {
             for direction in DIRECTIONS {
@@ -51,8 +51,50 @@ impl Region {
     }
 
     fn sides(&self) -> usize {
-        // TODO
-        4
+        // Count the number of corners instead of sides, much easier
+        let mut corners = 0;
+
+        for &position in self.positions.iter() {
+            let north = position + Direction::North.into();
+            let east = position + Direction::East.into();
+            let south = position + Direction::South.into();
+            let west = position + Direction::West.into();
+
+            // Outer corners
+            if !self.contains(&north) && !self.contains(&west) {
+                corners += 1;
+            }
+            if !self.contains(&north) && !self.contains(&east) {
+                corners += 1;
+            }
+            if !self.contains(&south) && !self.contains(&east) {
+                corners += 1;
+            }
+            if !self.contains(&south) && !self.contains(&west) {
+                corners += 1;
+            }
+
+            let north_east = position + Direction::NorthEast.into();
+            let north_west = position + Direction::NorthWest.into();
+            let south_east = position + Direction::SouthEast.into();
+            let south_west = position + Direction::SouthWest.into();
+
+            // Inner corners
+            if self.contains(&north) && self.contains(&east) && !self.contains(&north_east) {
+                corners += 1;
+            }
+            if self.contains(&north) && self.contains(&west) && !self.contains(&north_west) {
+                corners += 1;
+            }
+            if self.contains(&south) && self.contains(&east) && !self.contains(&south_east) {
+                corners += 1;
+            }
+            if self.contains(&south) && self.contains(&west) && !self.contains(&south_west) {
+                corners += 1;
+            }
+        }
+
+        corners
     }
 }
 
@@ -98,6 +140,7 @@ fn parse(input: &str) -> Result<DataType> {
         find_region(&data, position, &mut region);
         regions.push(region);
     }
+
     Ok(regions)
 }
 
@@ -174,5 +217,34 @@ MMMISSJEEE"#;
         let (task1, task2) = solution.solve_for_test(input).unwrap();
         assert_eq!(task1, Some(1930));
         assert_eq!(task2, Some(1206));
+    }
+
+    #[test]
+    fn example4() {
+        let input = r#"EEEEE
+EXXXX
+EEEEE
+EXXXX
+EEEEE"#;
+
+        let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
+        let (task1, task2) = solution.solve_for_test(input).unwrap();
+        assert_eq!(task1, Some(692));
+        assert_eq!(task2, Some(236));
+    }
+
+    #[test]
+    fn example5() {
+        let input = r#"AAAAAA
+AAABBA
+AAABBA
+ABBAAA
+ABBAAA
+AAAAAA"#;
+
+        let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
+        let (task1, task2) = solution.solve_for_test(input).unwrap();
+        assert_eq!(task1, Some(1184));
+        assert_eq!(task2, Some(368));
     }
 }
