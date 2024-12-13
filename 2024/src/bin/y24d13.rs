@@ -1,6 +1,5 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 13;
-use std::fmt::Display;
 
 use aoc::*;
 use nom::{
