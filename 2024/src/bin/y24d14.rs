@@ -1,26 +1,25 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 14;
+
 use aoc::*;
+use itertools::Itertools;
 use nom::{
     bytes::complete::tag,
-    character::{
-        self,
-        complete::{newline, space1},
-    },
+    character::complete::{self, newline, space1},
     multi::separated_list1,
-    sequence::separated_pair,
+    sequence::{preceded, separated_pair},
     IResult,
 };
 
 struct Room {
-    width: u64,
-    height: u64,
+    width: i64,
+    height: i64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Position {
-    x: u64,
-    y: u64,
+    x: i64,
+    y: i64,
 }
 
 #[derive(Debug, Clone)]
@@ -36,16 +35,18 @@ struct Robot {
 }
 
 fn position(input: &str) -> IResult<&str, Position> {
-    let (input, _) = tag("p=")(input)?;
-    let (input, (x, y)) =
-        separated_pair(character::complete::u64, tag(","), character::complete::u64)(input)?;
+    let (input, (x, y)) = preceded(
+        tag("p="),
+        separated_pair(complete::i64, tag(","), complete::i64),
+    )(input)?;
     Ok((input, Position { x, y }))
 }
 
 fn velocity(input: &str) -> IResult<&str, Velocity> {
-    let (input, _) = tag("v=")(input)?;
-    let (input, (x, y)) =
-        separated_pair(character::complete::i64, tag(","), character::complete::i64)(input)?;
+    let (input, (x, y)) = preceded(
+        tag("v="),
+        separated_pair(complete::i64, tag(","), complete::i64),
+    )(input)?;
     Ok((input, Velocity { x, y }))
 }
 
@@ -55,25 +56,29 @@ fn robot(input: &str) -> IResult<&str, Robot> {
 }
 
 impl Robot {
-    fn move_robot(&mut self, seconds: u64, room: &Room) {
-        let mut x = self.position.x as i64;
-        let mut y = self.position.y as i64;
+    fn move_seconds(&mut self, seconds: i64, room: &Room) {
+        let x = self.position.x + self.velocity.x * seconds;
+        let y = self.position.y + self.velocity.y * seconds;
 
-        x += self.velocity.x * seconds as i64;
-        y += self.velocity.y * seconds as i64;
+        self.position.x = x.rem_euclid(room.width);
+        self.position.y = y.rem_euclid(room.height);
+    }
+}
 
-        x %= room.width as i64;
-        y %= room.height as i64;
-
-        if x < 0 {
-            x += room.width as i64;
+#[allow(dead_code)]
+fn debug_robots(robots: &[Robot], room: &Room) {
+    for y in 0..room.height {
+        for x in 0..room.width {
+            match robots
+                .iter()
+                .filter(|robot| robot.position.x == x && robot.position.y == y)
+                .count()
+            {
+                0 => print!("."),
+                n => print!("{n}"),
+            }
         }
-        if y < 0 {
-            y += room.height as i64;
-        }
-
-        self.position.x = x as u64;
-        self.position.y = y as u64;
+        println!();
     }
 }
 
@@ -84,7 +89,7 @@ fn parse(input: &str) -> Result<DataType> {
     let (_, robots) = separated_list1(newline, robot)(input).map_err(|_| AoCError::BadInput)?;
 
     // Ugly hack, but room is smaller for tests
-    let room = if robots.len() == 12 {
+    let room = if cfg!(test) {
         Room {
             width: 11,
             height: 7,
@@ -101,32 +106,48 @@ fn parse(input: &str) -> Result<DataType> {
 
 fn task1(data: &DataType) -> Result<ResultType> {
     let room = &data.0;
-    let mut data = data.1.clone();
+    let mut robots = data.1.clone();
 
-    data.iter_mut()
-        .for_each(|robot| robot.move_robot(100, room));
+    robots
+        .iter_mut()
+        .for_each(|robot| robot.move_seconds(100, room));
 
-    let q1 = data
+    let q1 = robots
         .iter()
         .filter(|robot| robot.position.x < room.width / 2 && robot.position.y < room.height / 2)
         .count();
-    let q2 = data
+    let q2 = robots
         .iter()
         .filter(|robot| robot.position.x > room.width / 2 && robot.position.y < room.height / 2)
         .count();
-    let q3 = data
+    let q3 = robots
         .iter()
         .filter(|robot| robot.position.x < room.width / 2 && robot.position.y > room.height / 2)
         .count();
-    let q4 = data
+    let q4 = robots
         .iter()
         .filter(|robot| robot.position.x > room.width / 2 && robot.position.y > room.height / 2)
         .count();
     Ok(q1 * q2 * q3 * q4)
 }
 
-fn task2(_data: &DataType) -> Result<ResultType> {
-    Err(AoCError::Unsolved)
+fn task2(data: &DataType) -> Result<ResultType> {
+    let room = &data.0;
+    let mut robots = data.1.clone();
+
+    let mut seconds = 0;
+    loop {
+        seconds += 1;
+        robots
+            .iter_mut()
+            .for_each(|robot| robot.move_seconds(1, room));
+
+        if robots.iter().map(|robot| robot.position).all_unique() {
+            break;
+        }
+    }
+
+    Ok(seconds)
 }
 
 fn main() -> Result<()> {
@@ -162,6 +183,6 @@ p=9,5 v=-3,-3"#;
         let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
         let (task1, task2) = solution.solve_for_test(input).unwrap();
         assert_eq!(task1, Some(12));
-        assert_eq!(task2, None);
+        assert_eq!(task2, Some(1));
     }
 }
