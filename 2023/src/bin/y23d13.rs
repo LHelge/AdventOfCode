@@ -1,111 +1,197 @@
+const YEAR: u16 = 2023;
+const DAY: u8 = 13;
+
+use std::fmt::Display;
+
 use aoc::*;
-use std::str::FromStr;
+use nom::{
+    character::complete::{line_ending, one_of},
+    multi::{many1, separated_list1},
+    IResult,
+};
+use vec2d::{Position, Vec2d};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Material {
+    Ash,
+    Rocks,
+}
+
+impl TryFrom<char> for Material {
+    type Error = AoCError;
+
+    fn try_from(value: char) -> Result<Self> {
+        match value {
+            '#' => Ok(Material::Rocks),
+            '.' => Ok(Material::Ash),
+            _ => Err(AoCError::BadInput),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+enum Reflection {
+    Vertical(usize),
+    Horizontal(usize),
+}
 
 #[derive(Debug, Clone)]
-struct Plane {
-    rows: Vec<String>,
-    cols: Vec<String>,
+struct Pattern {
+    original: Vec2d<Material>,
+    transposed: Vec2d<Material>,
 }
 
-impl FromStr for Plane {
-    type Err = AoCError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let rows = s.lines().map(|l| l.trim().to_owned()).collect::<Vec<_>>();
-
-        let cols = (0..rows[0].len())
-            .map(|i| {
-                rows.iter()
-                    .map(|r| r.chars().nth(i).unwrap())
-                    .collect::<String>()
-            })
-            .collect::<Vec<_>>();
-
-        Ok(Self { rows, cols })
-    }
-}
-
-impl Plane {
-    fn is_mirrored_col(&self) -> Option<usize> {
-        (1..self.cols.len() - 1).find(|&col| {
-            self.cols[col..]
-                .iter()
-                .zip(self.cols[..col].iter().rev())
-                .all(|(a, b)| a == b)
-        })
-    }
-
-    fn is_mirrored_row(&self) -> Option<usize> {
-        (1..self.rows.len() - 1).find(|&row| {
-            self.rows[row..]
-                .iter()
-                .zip(self.rows[..row].iter().rev())
-                .all(|(a, b)| a == b)
-        })
-    }
-
-    fn print_mirrored_row(&self, row: usize) {
-        for (i, r) in self.rows.iter().enumerate() {
-            if row == i {
-                println!("{}", "-".repeat(r.len() + 3));
+impl Display for Pattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for row in self.original.data() {
+            for m in row {
+                write!(
+                    f,
+                    "{}",
+                    match m {
+                        Material::Ash => '.',
+                        Material::Rocks => '#',
+                    }
+                )?;
             }
-            println!("{}: {}", i + 1, r);
+            writeln!(f)?;
+        }
+        Ok(())
+    }
+}
+
+impl Pattern {
+    fn new(original: Vec2d<Material>) -> Self {
+        let transposed = original.transposed();
+
+        Self {
+            original,
+            transposed,
         }
     }
 
-    fn print_mirrored_col(&self, col: usize) {
-        for (i, c) in self.cols.iter().enumerate() {
-            if col == i {
-                println!("{}", "-".repeat(c.len() + 3));
+    fn find_reflections(&self) -> Vec<Reflection> {
+        let mut reflections = Vec::new();
+        // Look for horizontal reflection
+        for i in 1..self.original.height() {
+            let (first, last) = self.original.data().split_at(i);
+
+            if first.iter().rev().zip(last.iter()).all(|(a, b)| a == b) {
+                reflections.push(Reflection::Horizontal(i));
             }
-            println!("{}: {}", i + 1, c);
         }
+
+        // Look for vertical reflection
+        for i in 1..self.transposed.height() {
+            let (first, last) = self.transposed.data().split_at(i);
+
+            if first.iter().rev().zip(last.iter()).all(|(a, b)| a == b) {
+                reflections.push(Reflection::Vertical(i));
+            }
+        }
+
+        reflections
+    }
+
+    fn find_alternate_reflection(&mut self) -> Option<Reflection> {
+        let original = *self.find_reflections().first()?;
+
+        for pos in self.original.size().iter() {
+            self.fix_smudge(pos).unwrap();
+
+            for &reflection in self.find_reflections().iter() {
+                if reflection != original {
+                    // reset smudge
+                    self.fix_smudge(pos).unwrap();
+
+                    return Some(reflection);
+                }
+            }
+
+            // reset smudge
+            self.fix_smudge(pos).unwrap();
+        }
+
+        None
+    }
+
+    fn fix_smudge(&mut self, pos: Position) -> Result<()> {
+        self.original.modify(pos, toggle)?;
+        self.transposed.modify(pos.invert(), toggle)?;
+        Ok(())
     }
 }
 
-fn solve_task(input: &str) -> (usize, u64) {
-    let planes: Vec<Plane> = input
-        .split("\n\n")
-        .map(|s| s.parse::<Plane>().unwrap())
-        .collect();
-
-    let mut task1 = 0;
-    for plane in planes {
-        if let Some(col) = plane.is_mirrored_col() {
-            task1 += col;
-
-            plane.print_mirrored_col(col);
-            println!("Col score: {}\n", col);
-        }
-        if let Some(row) = plane.is_mirrored_row() {
-            task1 += 100 * row;
-
-            plane.print_mirrored_row(row);
-            println!("Row score: {}\n", 100 * row);
-        }
-    }
-
-    (task1, 0)
+fn toggle(m: &mut Material) {
+    *m = match m {
+        Material::Ash => Material::Rocks,
+        Material::Rocks => Material::Ash,
+    };
 }
 
-fn main() {
-    let input = AoCInput::from_env()
-        .get_input(2023, 12)
-        .expect("Could not fetch input");
+fn pattern(input: &str) -> IResult<&str, Pattern> {
+    let (input, rows) = separated_list1(line_ending, many1(one_of("#.")))(input)?;
+    let data = rows
+        .iter()
+        .map(|row| row.iter().map(|&c| c.try_into().unwrap()).collect())
+        .collect::<Vec<Vec<Material>>>();
 
-    let (task1, task2) = solve_task(&input);
+    let original = Vec2d::new(data).unwrap();
 
-    println!("Task 1: {}", task1);
-    println!("Task 2: {}", task2);
+    Ok((input, Pattern::new(original)))
+}
+
+type ResultType = usize;
+type DataType = Vec<Pattern>;
+
+fn parse(input: &str) -> Result<DataType> {
+    let (_, patterns) =
+        separated_list1(many1(line_ending), pattern)(input).map_err(|_| AoCError::BadInput)?;
+    Ok(patterns)
+}
+
+fn task1(data: &DataType) -> Result<ResultType> {
+    Ok(data
+        .iter()
+        .map(|p| match p.find_reflections().first() {
+            Some(Reflection::Vertical(i)) => *i,
+            Some(Reflection::Horizontal(i)) => i * 100,
+            _ => panic!("No reflection found in pattern: \n{}", p),
+        })
+        .sum())
+}
+
+fn task2(data: &DataType) -> Result<ResultType> {
+    let mut data = data.clone();
+
+    Ok(data
+        .iter_mut()
+        .map(|p| match p.find_alternate_reflection() {
+            Some(Reflection::Vertical(i)) => i,
+            Some(Reflection::Horizontal(i)) => i * 100,
+            _ => panic!("No reflection found in pattern: \n{}", p),
+        })
+        .sum())
+}
+
+fn main() -> Result<()> {
+    let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
+    solution.solve_for_answer(YEAR, DAY)?;
+
+    println!("Advent of Code {YEAR} day {DAY}");
+    println!("-------------------------");
+    println!("{solution}");
+
+    Ok(())
 }
 
 #[cfg(test)]
-mod y2023d13 {
+mod tests {
     use super::*;
 
     #[test]
     fn examples() {
-        let example_input = r#"#.##..##.
+        let input = r#"#.##..##.
 ..#.##.#.
 ##......#
 ##......#
@@ -121,9 +207,9 @@ mod y2023d13 {
 ..##..###
 #....#..#"#;
 
-        let (example1, _example2) = solve_task(example_input);
-
-        assert_eq!(example1, 405);
-        //assert_eq!(example2, 0);
+        let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
+        let (task1, task2) = solution.solve_for_test(input).unwrap();
+        assert_eq!(task1, Some(405));
+        assert_eq!(task2, Some(400));
     }
 }

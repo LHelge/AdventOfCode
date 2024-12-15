@@ -126,6 +126,13 @@ impl Position {
     pub fn is_inside(&self, size: Size) -> bool {
         self.x < size.width && self.y < size.height
     }
+
+    pub fn invert(self) -> Self {
+        Self {
+            x: self.y,
+            y: self.x,
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -295,6 +302,36 @@ impl<T> Vec2d<T> {
             current: Position::new(0, 0),
         }
     }
+
+    pub fn data(&self) -> &Vec<Vec<T>> {
+        &self.data
+    }
+
+    pub fn transposed(&self) -> Self
+    where
+        T: Clone,
+    {
+        let mut transposed = Vec::with_capacity(self.width());
+        for x in 0..self.width() {
+            let mut row = Vec::with_capacity(self.height());
+            for y in 0..self.height() {
+                row.push(self.data[y][x].clone());
+            }
+            transposed.push(row);
+        }
+
+        // Should never fail since the original Vec2d is square
+        Self::new(transposed).unwrap()
+    }
+
+    pub fn modify(&mut self, pos: Position, f: fn(&mut T)) -> Result<(), Error> {
+        if !pos.is_inside(self.size) {
+            return Err(Error::OutOfBounds);
+        }
+
+        f(&mut self.data[pos.y][pos.x]);
+        Ok(())
+    }
 }
 
 pub struct Vec2dIter<'a, T> {
@@ -438,5 +475,47 @@ mod tests {
         assert_eq!(vec2d.get(Position::new(1, 1)), Some(&5));
         assert_eq!(vec2d.get(Position::new(2, 2)), Some(&9));
         assert_eq!(vec2d.get(Position::new(3, 4)), None);
+    }
+
+    #[test]
+    fn test_transposed() {
+        let data = vec![
+            vec![1, 2, 3],
+            vec![4, 5, 6],
+            vec![7, 8, 9],
+            vec![10, 12, 12],
+        ];
+
+        let vec2d = Vec2d::new(data).unwrap().transposed();
+
+        assert_eq!(vec2d.width(), 4);
+        assert_eq!(vec2d.height(), 3);
+
+        assert_eq!(vec2d.get(Position::new(0, 0)), Some(&1));
+        assert_eq!(vec2d.get(Position::new(1, 0)), Some(&4));
+        assert_eq!(vec2d.get(Position::new(2, 0)), Some(&7));
+        assert_eq!(vec2d.get(Position::new(3, 0)), Some(&10));
+        assert_eq!(vec2d.get(Position::new(0, 1)), Some(&2));
+        assert_eq!(vec2d.get(Position::new(1, 1)), Some(&5));
+        assert_eq!(vec2d.get(Position::new(2, 1)), Some(&8));
+        assert_eq!(vec2d.get(Position::new(3, 1)), Some(&12));
+        assert_eq!(vec2d.get(Position::new(0, 2)), Some(&3));
+        assert_eq!(vec2d.get(Position::new(1, 2)), Some(&6));
+        assert_eq!(vec2d.get(Position::new(2, 2)), Some(&9));
+        assert_eq!(vec2d.get(Position::new(3, 2)), Some(&12));
+    }
+
+    #[test]
+    fn test_modify() {
+        let data = vec![vec![1, 2], vec![3, 4]];
+
+        let mut vec2d = Vec2d::new(data).unwrap();
+
+        vec2d.modify(Position::new(0, 0), |x| *x = 5).unwrap();
+
+        assert_eq!(vec2d.get(Position::new(0, 0)), Some(&5));
+        assert_eq!(vec2d.get(Position::new(0, 1)), Some(&3));
+        assert_eq!(vec2d.get(Position::new(1, 0)), Some(&2));
+        assert_eq!(vec2d.get(Position::new(1, 1)), Some(&4));
     }
 }
