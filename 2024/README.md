@@ -16,8 +16,8 @@
 - [Day 12](src/bin/y24d12.rs) - Garden Groups
 - [Day 13](src/bin/y24d13.rs) - Claw Contraption
 - [Day 14](src/bin/y24d14.rs) - Restroom Redoubt
-- [Day 15](src/bin/y24d15.rs) - 
-- Day 16
+- [Day 15](src/bin/y24d15.rs) - Warehouse Woes
+- [Day 16](src/bin/y24d16.rs) - 
 - Day 17
 - Day 18
 - Day 19
