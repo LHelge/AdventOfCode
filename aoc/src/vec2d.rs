@@ -3,8 +3,11 @@ use std::{
     iter::Flatten,
     ops::{Add, Mul, Sub},
     slice,
+    str::FromStr,
 };
 use strum::EnumIter;
+
+use crate::AoCError;
 
 #[derive(Debug)]
 pub enum Error {
@@ -45,6 +48,10 @@ impl Size {
             size: *self,
             current: Position::new(0, 0),
         }
+    }
+
+    pub fn contains(&self, pos: Position) -> bool {
+        pos.is_inside(self)
     }
 }
 
@@ -123,7 +130,7 @@ impl Position {
         Self { x, y }
     }
 
-    pub fn is_inside(&self, size: Size) -> bool {
+    pub fn is_inside(&self, size: &Size) -> bool {
         self.x < size.width && self.y < size.height
     }
 
@@ -223,6 +230,28 @@ impl Direction {
             Self::NorthWest => Direction::West,
         }
     }
+
+    pub fn is_east_west(&self) -> bool {
+        matches!(self, Self::East | Self::West)
+    }
+
+    pub fn is_north_south(&self) -> bool {
+        matches!(self, Self::North | Self::South)
+    }
+}
+
+impl TryFrom<char> for Direction {
+    type Error = AoCError;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '^' => Ok(Self::North),
+            '>' => Ok(Self::East),
+            'v' => Ok(Self::South),
+            '<' => Ok(Self::West),
+            c => Err(AoCError::BadCharacter(c)),
+        }
+    }
 }
 
 /// A 2D vector that can be indexed with a `Position` struct.
@@ -253,8 +282,8 @@ impl<T> Vec2d<T> {
         }
     }
 
-    pub fn size(&self) -> Size {
-        self.size
+    pub fn size(&self) -> &Size {
+        &self.size
     }
 
     pub fn width(&self) -> usize {
@@ -270,7 +299,7 @@ impl<T> Vec2d<T> {
     }
 
     pub fn set(&mut self, pos: Position, item: T) -> Result<(), Error> {
-        if !pos.is_inside(self.size) {
+        if !self.size.contains(pos) {
             return Err(Error::OutOfBounds);
         }
 
@@ -325,12 +354,42 @@ impl<T> Vec2d<T> {
     }
 
     pub fn modify(&mut self, pos: Position, f: fn(&mut T)) -> Result<(), Error> {
-        if !pos.is_inside(self.size) {
+        if !self.size.contains(pos) {
             return Err(Error::OutOfBounds);
         }
 
         f(&mut self.data[pos.y][pos.x]);
         Ok(())
+    }
+
+    pub fn swap(&mut self, src: Position, dst: Position) -> Result<(), Error>
+    where
+        T: Copy,
+    {
+        if !self.size.contains(src) || !self.size.contains(dst) {
+            return Err(Error::OutOfBounds);
+        }
+
+        let tmp = self.data[src.y][src.x];
+        self.data[src.y][src.x] = self.data[dst.y][dst.x];
+        self.data[dst.y][dst.x] = tmp;
+        Ok(())
+    }
+}
+
+impl<T> FromStr for Vec2d<T>
+where
+    T: TryFrom<char, Error = AoCError>,
+{
+    type Err = AoCError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let data = s
+            .lines()
+            .map(|line| line.chars().map(T::try_from).collect())
+            .collect::<Result<Vec<Vec<T>>, Self::Err>>()?;
+
+        Ok(Self::new(data)?)
     }
 }
 
@@ -517,5 +576,21 @@ mod tests {
         assert_eq!(vec2d.get(Position::new(0, 1)), Some(&3));
         assert_eq!(vec2d.get(Position::new(1, 0)), Some(&2));
         assert_eq!(vec2d.get(Position::new(1, 1)), Some(&4));
+    }
+
+    #[test]
+    fn test_swap() {
+        let data = vec![vec![1, 2], vec![3, 4]];
+
+        let mut vec2d = Vec2d::new(data).unwrap();
+
+        vec2d
+            .swap(Position::new(0, 0), Position::new(1, 1))
+            .unwrap();
+
+        assert_eq!(vec2d.get(Position::new(0, 0)), Some(&4));
+        assert_eq!(vec2d.get(Position::new(0, 1)), Some(&3));
+        assert_eq!(vec2d.get(Position::new(1, 0)), Some(&2));
+        assert_eq!(vec2d.get(Position::new(1, 1)), Some(&1));
     }
 }

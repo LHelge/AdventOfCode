@@ -73,10 +73,10 @@ fn task1(data: &DataType) -> Result<ResultType> {
             let anti_a = a + distance;
             let anti_b = b - distance;
 
-            if anti_a.is_inside(data.map.size()) {
+            if data.map.size().contains(anti_a) {
                 antinodes.insert(anti_a);
             }
-            if anti_b.is_inside(data.map.size()) {
+            if data.map.size().contains(anti_b) {
                 antinodes.insert(anti_b);
             }
         }
@@ -100,13 +100,13 @@ fn task2(data: &DataType) -> Result<ResultType> {
 
             // Antennas are included
             let mut anti_a = a;
-            while anti_a.is_inside(data.map.size()) {
+            while data.map.size().contains(anti_a) {
                 antinodes.insert(anti_a);
                 anti_a = anti_a + distance;
             }
 
             let mut anti_b = b;
-            while anti_b.is_inside(data.map.size()) {
+            while data.map.size().contains(anti_b) {
                 antinodes.insert(anti_b);
                 anti_b = anti_b - distance;
             }

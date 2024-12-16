@@ -1,9 +1,9 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 6;
-use std::collections::HashSet;
 use aoc::vec2d::*;
 use aoc::*;
 use rayon::prelude::*;
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum MapPoint {
@@ -80,7 +80,7 @@ fn parse(input: &str) -> Result<DataType> {
 
 fn task1(data: &DataType) -> Result<ResultType> {
     let mut data = data.clone();
-    
+
     while data.move_guard().is_ok() {}
 
     Ok(data
@@ -92,25 +92,32 @@ fn task1(data: &DataType) -> Result<ResultType> {
 
 fn task2(data: &DataType) -> Result<ResultType> {
     // Brute force through all possible new obstructions
-    let task2 = data.map.size().iter().collect::<Vec<Position>>().par_iter().filter(|&pos| {
-        // Skip if there's already an obstruction
-        if matches!(data.map.get(*pos), Some(MapPoint::Obstruction)) {
-            return false;
-        }
-
-        let mut data = data.clone();
-        data.map.set(*pos, MapPoint::Obstruction).ok();
-
-        let mut visited: HashSet<Guard> = HashSet::new();
-
-        while data.move_guard().is_ok() {
-            if !visited.insert(data.guard) {
-                return true;
+    let task2 = data
+        .map
+        .size()
+        .iter()
+        .collect::<Vec<Position>>()
+        .par_iter()
+        .filter(|&pos| {
+            // Skip if there's already an obstruction
+            if matches!(data.map.get(*pos), Some(MapPoint::Obstruction)) {
+                return false;
             }
-        }
 
-        false
-    }).count();
+            let mut data = data.clone();
+            data.map.set(*pos, MapPoint::Obstruction).ok();
+
+            let mut visited: HashSet<Guard> = HashSet::new();
+
+            while data.move_guard().is_ok() {
+                if !visited.insert(data.guard) {
+                    return true;
+                }
+            }
+
+            false
+        })
+        .count();
 
     Ok(task2)
 }
