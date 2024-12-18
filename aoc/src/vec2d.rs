@@ -204,8 +204,20 @@ pub enum Direction {
     NorthWest,
 }
 
+impl Display for Direction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::North => write!(f, "^"),
+            Self::East => write!(f, ">"),
+            Self::South => write!(f, "v"),
+            Self::West => write!(f, "<"),
+            _ => write!(f, "X"),
+        }
+    }
+}
+
 impl Direction {
-    pub fn turn_cv(&self) -> Direction {
+    pub fn turn_cw(&self) -> Direction {
         match self {
             Self::North => Direction::NorthEast,
             Self::NorthEast => Direction::East,
@@ -218,7 +230,7 @@ impl Direction {
         }
     }
 
-    pub fn turn_ccv(&self) -> Direction {
+    pub fn turn_ccw(&self) -> Direction {
         match self {
             Self::North => Direction::NorthWest,
             Self::NorthEast => Direction::North,
@@ -375,6 +387,15 @@ impl<T> Vec2d<T> {
         self.data[dst.y][dst.x] = tmp;
         Ok(())
     }
+
+    pub fn find_position(&self, value: &T) -> Option<Position> where T: Eq {
+        self.iter().find_map(|(p, v)| {
+            if v.eq(value) {
+                Some(p)
+            } else {
+                None
+            }})
+    }
 }
 
 impl<T> FromStr for Vec2d<T>
@@ -517,6 +538,45 @@ mod tests {
     }
 
     #[test]
+    fn test_direction_turning() {
+        let mut dir = Direction::North;
+
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::NorthEast);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::East);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::SouthEast);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::South);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::SouthWest);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::West);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::NorthWest);
+        dir = dir.turn_cw();
+        assert_eq!(dir, Direction::North);
+
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::NorthWest);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::West);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::SouthWest);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::South);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::SouthEast);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::East);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::NorthEast);
+        dir = dir.turn_ccw();
+        assert_eq!(dir, Direction::North);
+    }
+
+    #[test]
     fn test_vec2d() {
         let data = vec![
             vec![1, 2, 3],
@@ -592,5 +652,18 @@ mod tests {
         assert_eq!(vec2d.get(Position::new(0, 1)), Some(&3));
         assert_eq!(vec2d.get(Position::new(1, 0)), Some(&2));
         assert_eq!(vec2d.get(Position::new(1, 1)), Some(&1));
+    }
+
+    #[test]
+    fn test_find_position() {
+        let data = vec![vec![1, 2], vec![3, 4]];
+
+        let vec2d = Vec2d::new(data).unwrap();
+
+        assert_eq!(vec2d.find_position(&1), Some(Position {x: 0, y: 0}));
+        assert_eq!(vec2d.find_position(&2), Some(Position {x: 1, y: 0}));
+        assert_eq!(vec2d.find_position(&3), Some(Position {x: 0, y: 1}));
+        assert_eq!(vec2d.find_position(&4), Some(Position {x: 1, y: 1}));
+        assert_eq!(vec2d.find_position(&7), None);
     }
 }
