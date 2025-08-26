@@ -8,7 +8,7 @@ This repository contains Rust solutions for [Advent of Code](https://adventofcod
 
 ### Prerequisites
 - Rust and Cargo must be installed
-- Valid Advent of Code session token required for fetching puzzle input
+- Session token NOT required for Copilot tasks (tests run without it)
 
 ### Essential Commands with Timing
 Execute these commands from the repository root:
@@ -18,7 +18,7 @@ Execute these commands from the repository root:
 cargo build
 ```
 - Takes ~47 seconds to complete. **NEVER CANCEL** - set timeout to 90+ minutes.
-- Produces warnings about lifetime elision (this is expected).
+- Completes successfully with warnings (lifetime elision warnings are expected).
 
 **Run all tests:**
 ```bash
@@ -40,23 +40,18 @@ cargo test --bin y24d12
 - Runs only tests for that specific day's solution.
 - Very fast (under 0.1 seconds).
 
-**Lint code (fails currently):**
+**Lint code:**
 ```bash
 cargo clippy -- -D warnings
 ```
-- Takes ~45 seconds but **FAILS** due to existing lifetime warnings in aoc/multiset.rs and other files.
-- **NEVER CANCEL** - set timeout to 90+ minutes.
-- Do not try to fix these warnings unless specifically asked.
+- Takes ~45 seconds to complete. **NEVER CANCEL** - set timeout to 90+ minutes.
+- Currently fails due to lifetime warnings in aoc/multiset.rs, but improvements are expected.
 
-**Run solution for specific day:**
-```bash
-cargo run --bin y24d12
-```
-- Requires SESSION environment variable (see setup below).
-- Without SESSION, fails with "Environment variable error: environment variable not found".
 
 ### Session Token Setup
-To run actual solutions (not just tests), set your Advent of Code session token:
+**NOTE: Session tokens are NOT needed for Copilot tasks. Only use if you need to run actual solutions manually.**
+
+To run actual solutions (not needed for Copilot), set your Advent of Code session token:
 
 **Option 1 - Environment variable:**
 ```bash
@@ -141,12 +136,12 @@ Key modules in the `aoc` crate:
    - Tests only the specified day
    - Fastest feedback for single day changes
 
-5. **Solution execution test:**
+5. **Solution execution validation (NOT for Copilot):**
    ```bash
-   cargo run --bin y24d12
+   cargo test --bin y24d12
    ```
-   - Should fail gracefully without SESSION token
-   - With valid SESSION, should fetch input and display results
+   - Use tests instead of running actual solutions
+   - Copilot should NEVER run solutions to find answers
 
 ## Common Tasks
 
@@ -161,7 +156,7 @@ Recent complete solutions for reference:
 2. Implement `parse`, `task1`, `task2` functions
 3. Add test cases with known example inputs
 4. Run `cargo test -p aoc<year>` to validate
-5. Test with real input using `cargo run --bin y<YY>d<DD>`
+5. Run `cargo test -p aoc<year>` to validate (DO NOT run actual solutions)
 
 ### Debugging Test Failures
 - Individual day tests use hardcoded example inputs
@@ -170,17 +165,19 @@ Recent complete solutions for reference:
 
 ## Important Notes
 
+- **🚨 CRITICAL: Copilot must NEVER solve Advent of Code problems. The user wants to solve them personally without AI assistance.**
+- **Copilot can help with:** linting errors, refactoring, build issues, test fixes, code quality improvements
+- **Copilot must NOT:** implement solutions, provide algorithm hints, or run binaries to find answers
 - **WARNING**: Some tests take very long (y15d04 is ignored for this reason)
-- **WARNING**: Clippy currently fails - do not attempt to fix unless specifically requested
-- The repository builds and tests successfully despite warnings
+- The repository builds and tests successfully
 - Input fetching requires internet access to adventofcode.com
 - Session tokens expire - refresh if getting authentication errors
 - Each year is completely independent - changes in one year don't affect others
 
 ## CI/CD Information
 GitHub Actions workflow (`.github/workflows/rust.yml`) runs:
-1. `cargo clippy -- -D warnings` (currently fails)
+1. `cargo clippy -- -D warnings` (currently fails due to lifetime warnings)
 2. `cargo build` 
 3. `cargo test`
 
-The clippy step will fail in CI due to existing warnings. This is a known issue.
+Build and test steps should pass successfully.
