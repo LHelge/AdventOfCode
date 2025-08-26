@@ -1,5 +1,5 @@
 pub trait Multiset<T> {
-    fn multiset(&self, length: usize) -> MultisetIterator<T>;
+    fn multiset(&self, length: usize) -> MultisetIterator<'_, T>;
 }
 
 pub struct MultisetIterator<'a, T> {
@@ -41,7 +41,7 @@ where
 }
 
 impl<T> Multiset<T> for [T] {
-    fn multiset(&self, length: usize) -> MultisetIterator<T> {
+    fn multiset(&self, length: usize) -> MultisetIterator<'_, T> {
         MultisetIterator {
             set: self,
             indices: vec![0; length],

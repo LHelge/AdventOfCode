@@ -69,9 +69,7 @@ fn parse(input: &str) -> Result<DataType> {
 }
 
 fn task1(data: &DataType) -> Result<ResultType> {
-    Ok(data
-        .iter()
-        .map(|(_, trails)| {
+    Ok(data.values().map(|trails| {
             trails
                 .iter()
                 .map(|trail| *trail.last().unwrap())
@@ -82,7 +80,7 @@ fn task1(data: &DataType) -> Result<ResultType> {
 }
 
 fn task2(data: &DataType) -> Result<ResultType> {
-    Ok(data.iter().map(|(_, trails)| trails.len()).sum())
+    Ok(data.values().map(|trails| trails.len()).sum())
 }
 
 fn main() -> Result<()> {

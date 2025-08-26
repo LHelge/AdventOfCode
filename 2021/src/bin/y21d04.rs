@@ -57,7 +57,7 @@ impl BingoBoard {
         Self { board, won: false }
     }
 
-    fn row(&self, row: usize) -> RowIterator {
+    fn row(&self, row: usize) -> RowIterator<'_> {
         RowIterator {
             board: self,
             row,
@@ -65,7 +65,7 @@ impl BingoBoard {
         }
     }
 
-    fn col(&self, col: usize) -> ColIterator {
+    fn col(&self, col: usize) -> ColIterator<'_> {
         ColIterator {
             board: self,
             row: 0,

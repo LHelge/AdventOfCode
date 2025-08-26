@@ -172,7 +172,7 @@ impl Maze {
     }
 
     /// Create an iterator that will walk the loop from the start
-    fn iter(&self) -> MazeWalker {
+    fn iter(&self) -> MazeWalker<'_> {
         MazeWalker {
             maze: self,
             position: self.start,
