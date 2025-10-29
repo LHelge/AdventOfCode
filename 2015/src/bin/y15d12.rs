@@ -12,11 +12,12 @@ enum JsonToken {
     RightSquareBrace,
     Colon,
     Period,
-    StringLitteral(String),
-    NumericLitteral(i64),
+    StringLiteral(String),
+    NumericLiteral(i64),
     EndOfString,
 }
 
+#[derive(Debug)]
 enum JsonValue {
     Numeric(i64),
     String(String),
@@ -126,21 +127,20 @@ impl Scanner {
             }
         }
 
-        Ok(JsonToken::NumericLitteral(number.parse()?))
+        Ok(JsonToken::NumericLiteral(number.parse()?))
     }
 
     fn scan_string_litteral(&mut self) -> Result<JsonToken> {
         let mut value = String::new();
 
-        while let Some((curr, next)) = self.next() {
-            if next.is_some_and(|n| n == '"') {
-                self.next();
+        while let Some((curr, _)) = self.next() {
+            if curr == '"' {
                 break;
             }
             value.push(curr);
         }
 
-        Ok(JsonToken::StringLitteral(value))
+        Ok(JsonToken::StringLiteral(value))
     }
 }
 
@@ -150,7 +150,17 @@ type DataType<'a> = JsonValue;
 fn parse_array(tokens: &mut impl Iterator<Item = JsonToken>) -> Result<JsonValue> {
     let mut array = Vec::new();
 
-    // TODO
+    loop {
+        match tokens.next() {
+            Some(JsonToken::RightSquareBrace) => break,
+            Some(JsonToken::Period) => continue, // Skip commas
+            Some(JsonToken::LeftBrace) => array.push(parse_object(tokens)?),
+            Some(JsonToken::LeftSquareBrace) => array.push(parse_array(tokens)?),
+            Some(JsonToken::NumericLiteral(n)) => array.push(JsonValue::Numeric(n)),
+            Some(JsonToken::StringLiteral(s)) => array.push(JsonValue::String(s)),
+            _ => return Err(AoCError::BadInput.into()),
+        }
+    }
 
     Ok(JsonValue::Array(array))
 }
@@ -158,12 +168,35 @@ fn parse_array(tokens: &mut impl Iterator<Item = JsonToken>) -> Result<JsonValue
 fn parse_object(tokens: &mut impl Iterator<Item = JsonToken>) -> Result<JsonValue> {
     let mut object = HashMap::new();
 
-    // TODO
+    loop {
+        match tokens.next() {
+            Some(JsonToken::RightBrace) => break,
+            Some(JsonToken::Period) => continue, // Skip commas
+            Some(JsonToken::StringLiteral(key)) => {
+                // Expect colon
+                if !matches!(tokens.next(), Some(JsonToken::Colon)) {
+                    return Err(AoCError::BadInput.into());
+                }
+
+                // Parse value
+                let value = match tokens.next() {
+                    Some(JsonToken::LeftBrace) => parse_object(tokens)?,
+                    Some(JsonToken::LeftSquareBrace) => parse_array(tokens)?,
+                    Some(JsonToken::NumericLiteral(n)) => JsonValue::Numeric(n),
+                    Some(JsonToken::StringLiteral(s)) => JsonValue::String(s),
+                    _ => return Err(AoCError::BadInput.into()),
+                };
+
+                object.insert(key, value);
+            }
+            _ => return Err(AoCError::BadInput.into()),
+        }
+    }
 
     Ok(JsonValue::Object(object))
 }
 
-fn parse(input: &str) -> Result<DataType> {
+fn parse(input: &str) -> Result<DataType<'_>> {
     let mut tokens = Scanner::new(input).tokens()?.into_iter();
 
     Ok(match tokens.next() {
@@ -235,7 +268,7 @@ mod tests {
         let (_, task2) = solution
             .solve_for_test(r#"[1,{"c":"red","b":2},3]"#)
             .unwrap();
-        assert_eq!(task2, Some(6));
+        assert_eq!(task2, Some(4));
 
         let (_, task2) = solution
             .solve_for_test(r#"{"d":"red","e":[1,2,3,4],"f":5}"#)
