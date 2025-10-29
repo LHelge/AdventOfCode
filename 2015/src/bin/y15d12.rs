@@ -119,7 +119,7 @@ impl Scanner {
         let mut number = String::from(curr);
 
         if next.is_some_and(|n| n.is_numeric()) {
-            while let Some((curr, next)) = self.next() {
+            for (curr, next) in self.by_ref() {
                 number.push(curr);
                 if !next.is_some_and(|n| n.is_numeric()) {
                     break;
@@ -133,7 +133,7 @@ impl Scanner {
     fn scan_string_litteral(&mut self) -> Result<JsonToken> {
         let mut value = String::new();
 
-        while let Some((curr, _)) = self.next() {
+        for (curr, _) in self.by_ref() {
             if curr == '"' {
                 break;
             }
@@ -158,7 +158,7 @@ fn parse_array(tokens: &mut impl Iterator<Item = JsonToken>) -> Result<JsonValue
             Some(JsonToken::LeftSquareBrace) => array.push(parse_array(tokens)?),
             Some(JsonToken::NumericLiteral(n)) => array.push(JsonValue::Numeric(n)),
             Some(JsonToken::StringLiteral(s)) => array.push(JsonValue::String(s)),
-            _ => return Err(AoCError::BadInput.into()),
+            _ => Err(AoCError::BadInput)?,
         }
     }
 
@@ -175,7 +175,7 @@ fn parse_object(tokens: &mut impl Iterator<Item = JsonToken>) -> Result<JsonValu
             Some(JsonToken::StringLiteral(key)) => {
                 // Expect colon
                 if !matches!(tokens.next(), Some(JsonToken::Colon)) {
-                    return Err(AoCError::BadInput.into());
+                    Err(AoCError::BadInput)?;
                 }
 
                 // Parse value
@@ -184,12 +184,12 @@ fn parse_object(tokens: &mut impl Iterator<Item = JsonToken>) -> Result<JsonValu
                     Some(JsonToken::LeftSquareBrace) => parse_array(tokens)?,
                     Some(JsonToken::NumericLiteral(n)) => JsonValue::Numeric(n),
                     Some(JsonToken::StringLiteral(s)) => JsonValue::String(s),
-                    _ => return Err(AoCError::BadInput.into()),
+                    _ => Err(AoCError::BadInput)?,
                 };
 
                 object.insert(key, value);
             }
-            _ => return Err(AoCError::BadInput.into()),
+            _ => Err(AoCError::BadInput)?,
         }
     }
 

@@ -18,14 +18,13 @@ fn blink(stone: u64, blinks_left: usize) -> usize {
     }
 
     let digits = stone.ilog10() + 1;
-    if digits % 2 == 0 {
-        let power = 10u64.pow(digits/2);
+    if digits.is_multiple_of(2) {
+        let power = 10u64.pow(digits / 2);
 
         let left = stone / power;
         let right = stone % power;
 
-        blink(left, blinks_left - 1)
-            + blink(right, blinks_left - 1)
+        blink(left, blinks_left - 1) + blink(right, blinks_left - 1)
     } else {
         blink(stone * 2024, blinks_left - 1)
     }
