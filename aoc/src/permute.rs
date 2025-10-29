@@ -48,7 +48,7 @@ where
 
         while self.i < self.v.len() {
             if self.c[self.i] < self.i {
-                if self.i % 2 == 0 {
+                if self.i.is_multiple_of(2) {
                     self.v.swap(0, self.i);
                 } else {
                     self.v.swap(self.c[self.i], self.i);
