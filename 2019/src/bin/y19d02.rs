@@ -48,11 +48,8 @@ mod tests {
 
     #[test]
     fn examples() {
-        let input = r#"1,9,10,3,2,3,11,0,99,30,40,50"#;
-
-        let mut solution = Solution::<ResultType, DataType>::new(&parse, &task1, &task2);
-        let (task1, task2) = solution.solve_for_test(input).unwrap();
-        assert_eq!(task1, Some(3500));
-        assert_eq!(task2, None);
+        let mut cpu = CPU::new("1,9,10,3,2,3,11,0,99,30,40,50".parse().unwrap());
+        cpu.run().unwrap();
+        assert_eq!(cpu.pos0().unwrap(), 3500);
     }
 }
