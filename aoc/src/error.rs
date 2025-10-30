@@ -4,6 +4,8 @@ use std::{
     num::ParseIntError,
 };
 
+use crate::intcode::IntCodeError;
+
 pub type Result<T> = std::result::Result<T, AoCError>;
 
 pub enum AoCError {
@@ -16,6 +18,7 @@ pub enum AoCError {
     FetchInput(String),
     Parser,
     Vec2d(crate::vec2d::Error),
+    IntCode(IntCodeError),
 }
 
 impl Display for AoCError {
@@ -33,6 +36,7 @@ impl Display for AoCError {
             AoCError::FetchInput(msg) => write!(f, "Could not fetch input: {msg}"),
             AoCError::Parser => write!(f, "Parser error"),
             AoCError::Vec2d(e) => write!(f, "Vec2d error: {e}"),
+            AoCError::IntCode(e) => write!(f, "Intcode error: {e}"),
         }
     }
 }
@@ -72,5 +76,11 @@ impl<I> From<nom::error::Error<I>> for AoCError {
 impl From<crate::vec2d::Error> for AoCError {
     fn from(e: crate::vec2d::Error) -> Self {
         AoCError::Vec2d(e)
+    }
+}
+
+impl From<crate::intcode::IntCodeError> for AoCError {
+    fn from(e: crate::intcode::IntCodeError) -> Self {
+        AoCError::IntCode(e)
     }
 }
