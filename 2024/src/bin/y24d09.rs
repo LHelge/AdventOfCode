@@ -146,6 +146,7 @@ fn task2(data: &DataType) -> Result<ResultType> {
     ids.sort();
 
     for &move_id in ids.iter().rev() {
+        #[allow(clippy::collapsible_if)]
         if let Some(index) = disk
             .iter()
             .position(|de| matches!(de, DiskEntity::File { size: _, id } if id == &move_id))

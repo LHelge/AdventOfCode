@@ -10,10 +10,10 @@ fn first_string_digit(line: &str) -> Option<(usize, char)> {
 
     // Go through all digits and find the first one
     for (i, number) in DIGITS.iter().enumerate() {
-        if let Some(pos) = line.find(number) {
-            if found.is_none() || pos < found.unwrap().0 {
-                found = Some((pos, (b'0' + i as u8) as char));
-            }
+        if let Some(pos) = line.find(number)
+            && (found.is_none() || pos < found.unwrap().0)
+        {
+            found = Some((pos, (b'0' + i as u8) as char));
         }
     }
 
@@ -31,10 +31,10 @@ fn last_string_digit(line: &str) -> Option<(usize, char)> {
 
     // Go through all digits and find the last one
     for (i, number) in DIGITS.iter().enumerate() {
-        if let Some(pos) = line.rfind(number) {
-            if found.is_none() || pos > found.unwrap().0 {
-                found = Some((pos, (b'0' + i as u8) as char));
-            }
+        if let Some(pos) = line.rfind(number)
+            && (found.is_none() || pos > found.unwrap().0)
+        {
+            found = Some((pos, (b'0' + i as u8) as char));
         }
     }
 

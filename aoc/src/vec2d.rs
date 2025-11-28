@@ -316,10 +316,10 @@ impl<T> Vec2d<T> {
         T: Eq,
     {
         for p in self.size().iter() {
-            if let Some(i) = self.get(p) {
-                if item == i {
-                    return Some((p, i));
-                }
+            if let Some(i) = self.get(p)
+                && i == item
+            {
+                return Some((p, i));
             }
         }
         None

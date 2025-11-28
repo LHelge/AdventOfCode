@@ -69,7 +69,7 @@ fn solve_task(input: &str) -> (usize, usize) {
 
     let task1 = rules
         .iter()
-        .filter(|(&bag, _)| does_bag_contain("shiny gold", bag, &rules))
+        .filter(|(bag, _)| does_bag_contain("shiny gold", bag, &rules))
         .count();
 
     let mut memoization = HashMap::new();
