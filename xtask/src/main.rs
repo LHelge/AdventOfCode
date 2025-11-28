@@ -1,6 +1,7 @@
 use args::*;
 use clap::Parser;
 use error::*;
+use std::env;
 use std::io::Write;
 use std::{
     fs::{self, File},
@@ -16,12 +17,52 @@ fn main() -> Result<()> {
     let xtask_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let workspace_root = xtask_root.ancestors().nth(1).unwrap();
 
+    let (year, day) = match (args.year, args.day) {
+        (y @ 2025, d @ 1..=12) => Ok((y, d)),
+        (y @ 2015..=2024, d @ 1..=25) => Ok((y, d)),
+        (y, d) => Err(Error::InvalidDay(y, d)),
+    }?;
+
     match args.command {
-        Command::New { year, day } => {
-            new_day(workspace_root, year, day)?;
-        }
+        None | Some(Command::Run) => run_day(workspace_root, year, day)?,
+        Some(Command::Test) => test_day(workspace_root, year, day)?,
+        Some(Command::New) => new_day(workspace_root, year, day)?,
     }
 
+    Ok(())
+}
+
+fn run_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
+    let cargo = env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+
+    let year = year % 100;
+    let binary = format!("y{year:02}d{day:02}");
+
+    let cmd = std::process::Command::new(cargo)
+        .current_dir(workspace_root)
+        .args(["run", "--release", "--bin", &binary])
+        .status()?;
+
+    if !cmd.success() {
+        Err(Error::RunFailed(year, day))?;
+    }
+    Ok(())
+}
+
+fn test_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
+    let cargo = env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+
+    let year = year % 100;
+    let binary = format!("y{year:02}d{day:02}");
+
+    let cmd = std::process::Command::new(cargo)
+        .current_dir(workspace_root)
+        .args(["test", "--bin", &binary])
+        .status()?;
+
+    if !cmd.success() {
+        Err(Error::TestsFailed(year, day))?;
+    }
     Ok(())
 }
 

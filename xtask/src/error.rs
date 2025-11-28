@@ -15,4 +15,10 @@ pub enum Error {
 
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
+
+    #[error("Failed to run day {1}, {0}")]
+    RunFailed(u16, u8),
+
+    #[error("Tests failed for day {1}, {0}")]
+    TestsFailed(u16, u8),
 }
