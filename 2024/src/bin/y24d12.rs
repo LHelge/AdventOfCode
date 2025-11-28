@@ -111,11 +111,12 @@ fn find_region(map: &Vec2d<char>, position: Position, region: &mut Region) {
 
     for direction in DIRECTIONS {
         let neighbour = position + direction.into();
-        if let Some(&id) = map.get(neighbour) {
-            if id == region.id && !region.contains(&neighbour) {
-                region.add(neighbour);
-                find_region(map, neighbour, region);
-            }
+        if let Some(&id) = map.get(neighbour)
+            && id == region.id
+            && !region.contains(&neighbour)
+        {
+            region.add(neighbour);
+            find_region(map, neighbour, region);
         }
     }
 }

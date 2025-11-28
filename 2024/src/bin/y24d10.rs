@@ -19,6 +19,7 @@ fn find_trails(map: &Vec2d<u8>, trail: &mut Trail) -> Vec<Trail> {
 
     let mut trails = vec![];
 
+    #[allow(clippy::collapsible_if)]
     if let Some(&pos) = trail.last() {
         if let Some(&tile) = map.get(pos) {
             for &dir in DIRECTIONS.iter() {
@@ -69,7 +70,9 @@ fn parse(input: &str) -> Result<DataType> {
 }
 
 fn task1(data: &DataType) -> Result<ResultType> {
-    Ok(data.values().map(|trails| {
+    Ok(data
+        .values()
+        .map(|trails| {
             trails
                 .iter()
                 .map(|trail| *trail.last().unwrap())

@@ -49,16 +49,18 @@ impl Field {
     }
 
     fn is_height_valid(value: &str) -> bool {
-        if let Some(centimeters) = value.strip_suffix("cm") {
-            if let Ok(centimeters) = centimeters.parse::<u16>() {
-                return (150..=193).contains(&centimeters);
-            };
+        if let Some(centimeters) = value
+            .strip_suffix("cm")
+            .and_then(|cm| cm.parse::<u16>().ok())
+        {
+            return (150..=193).contains(&centimeters);
         };
 
-        if let Some(inches) = value.strip_suffix("in") {
-            if let Ok(inches) = inches.parse::<u16>() {
-                return (59..=76).contains(&inches);
-            }
+        if let Some(inches) = value
+            .strip_suffix("in")
+            .and_then(|inches| inches.parse::<u16>().ok())
+        {
+            return (59..=76).contains(&inches);
         };
 
         false
