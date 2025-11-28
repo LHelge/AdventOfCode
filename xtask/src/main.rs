@@ -26,13 +26,11 @@ fn main() -> Result<()> {
 }
 
 fn new_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
-    if !(2015..=2024).contains(&year) {
-        return Err(Error::BadYear);
-    };
-
-    if !(1..=25).contains(&day) {
-        return Err(Error::BadDay);
-    };
+    match (year, day) {
+        (2025, 1..=12) => Ok(()),
+        (2015..=2024, 1..=25) => Ok(()),
+        (year, day) => Err(Error::InvalidDay(year, day)),
+    }?;
 
     let template = workspace_root.join("day_template.rs");
     if !template.exists() {
@@ -45,7 +43,7 @@ fn new_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
         .join("bin")
         .join(format!("y{}d{:02}.rs", year - 2000, day));
     if target.exists() {
-        return Err(Error::AlreadyExists);
+        return Err(Error::AlreadyExists(year, day));
     }
 
     let template = fs::read_to_string(template)?;
