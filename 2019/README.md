@@ -3,8 +3,8 @@
 [AoC 2019](https://adventofcode.com/2019/)
 
 - [Day 1](src/bin/y19d01.rs) - The Tyranny of the Rocket Equation
-- Day 2
-- Day 3
+- [Day 2](src/bin/y19d02.rs) - 1202 Program Alarm
+- [Day 3](src/bin/y19d03.rs) - Crossed Wires
 - Day 4
 - Day 5
 - Day 6
