@@ -1,5 +1,5 @@
-use crate::error::*;
 use crate::AoCInput;
+use crate::error::*;
 use std::{
     fmt::Display,
     time::{Duration, Instant},
@@ -67,12 +67,10 @@ where
         }
     }
 
-    pub fn solve_for_answer(&mut self, year: u16, day: u8) -> Result<()> {
-        let input = AoCInput::from_env()?.get_input(year, day)?;
-
+    pub fn solve_for_answer_input(&mut self, input: &str) -> Result<()> {
         // Parse
         let start = Instant::now();
-        let data = (self.parser)(&input)?;
+        let data = (self.parser)(input)?;
         self.parse = ParsingStatus::Parsed(start.elapsed());
 
         // Solve task 1
@@ -92,6 +90,11 @@ where
         }
 
         Ok(())
+    }
+
+    pub fn solve_for_answer(&mut self, year: u16, day: u8) -> Result<()> {
+        let input = AoCInput::from_env()?.get_input(year, day)?;
+        self.solve_for_answer_input(&input)
     }
 
     pub fn solve_for_test(&mut self, input: &str) -> Result<(Option<T>, Option<T>)> {
