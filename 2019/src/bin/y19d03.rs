@@ -1,7 +1,7 @@
 const YEAR: u16 = 2019;
 const DAY: u8 = 3;
 
-use aoc::*;
+use aoc::{parser::Parser, *};
 use std::{
     collections::{HashMap, HashSet},
     str::FromStr,
@@ -68,11 +68,7 @@ impl FromStr for Wire {
     type Err = AoCError;
 
     fn from_str(s: &str) -> Result<Self> {
-        Ok(Wire(
-            s.split(',')
-                .map(|seg| seg.parse::<Segment>())
-                .collect::<std::result::Result<Vec<Segment>, AoCError>>()?,
-        ))
+        Ok(Wire(s.parse_delimited(',')?))
     }
 }
 

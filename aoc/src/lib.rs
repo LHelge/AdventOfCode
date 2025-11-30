@@ -3,6 +3,7 @@ mod input;
 pub mod intcode;
 pub mod multiset;
 pub mod pairs;
+pub mod parser;
 pub mod permute;
 mod solution;
 pub mod vec2d;
