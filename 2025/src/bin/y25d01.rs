@@ -1,14 +1,56 @@
 const YEAR: u16 = 2025;
 const DAY: u8 = 1;
-use std::str::FromStr;
 
 use aoc::parser::Parser;
 use aoc::*;
+use std::ops::RangeInclusive;
+use std::str::FromStr;
+
+struct Dial {
+    position: i64,
+    range: RangeInclusive<i64>,
+}
+
+impl Dial {
+    fn new(start: i64, range: RangeInclusive<i64>) -> Self {
+        Self {
+            position: start,
+            range,
+        }
+    }
+
+    fn turn(&mut self, rotation: &Rotation) -> usize {
+        let (steps, dir, reset) = match rotation {
+            Rotation::Left(steps) => (*steps, -1i64, *self.range.end()),
+            Rotation::Right(steps) => (*steps, 1i64, *self.range.start()),
+        };
+
+        let mut zeros = 0;
+
+        for _ in 0..steps {
+            self.position += dir;
+
+            if !self.range.contains(&self.position) {
+                self.position = reset;
+            }
+
+            if self.is_zero() {
+                zeros += 1;
+            }
+        }
+
+        zeros
+    }
+
+    fn is_zero(&self) -> bool {
+        self.position == 0
+    }
+}
 
 #[derive(Debug)]
 enum Rotation {
-    Left(i32),
-    Right(i32),
+    Left(usize),
+    Right(usize),
 }
 
 impl FromStr for Rotation {
@@ -31,60 +73,24 @@ fn parse(input: &str) -> Result<DataType> {
 }
 
 fn task1(data: &DataType) -> Result<ResultType> {
-    let mut dial = 50;
-    let mut password = 0usize;
-
+    let mut dial = Dial::new(50, 0..=99);
+    let mut password = 0;
     for rotation in data {
-        dial += match rotation {
-            Rotation::Left(steps) => -*steps,
-            Rotation::Right(steps) => *steps,
-        };
-
-        while dial < 0 {
-            dial += 100
-        }
-        while dial > 99 {
-            dial -= 100
-        }
-
-        if dial == 0 {
+        _ = dial.turn(rotation);
+        if dial.is_zero() {
             password += 1;
         }
     }
+
     Ok(password)
 }
 
 fn task2(data: &DataType) -> Result<ResultType> {
-    let mut dial = 50;
-    let mut password = 0usize;
+    let mut dial = Dial::new(50, 0..=99);
+    let mut password = 0;
 
     for rotation in data {
-        dial += match rotation {
-            Rotation::Left(0) => continue,
-            Rotation::Right(0) => continue,
-            Rotation::Left(steps) => -*steps,
-            Rotation::Right(steps) => *steps,
-        };
-
-        print!("dial: {dial}");
-
-        if dial == 0 {
-            password += 1;
-        }
-
-        while dial < 0 {
-            dial += 100;
-            password += 1;
-            print!("spin-");
-        }
-
-        while dial > 99 {
-            dial -= 100;
-            password += 1;
-            print!("spin+");
-        }
-
-        println!("{rotation:?}: {dial}");
+        password += dial.turn(rotation);
     }
     Ok(password)
 }
