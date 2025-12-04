@@ -16,23 +16,22 @@ fn parse(input: &str) -> Result<DataType> {
 }
 
 fn task1(data: &DataType) -> Result<ResultType> {
-    let warehouse = data.clone();
+    Ok(data
+        .iter()
+        .filter(|(pos, roll)| {
+            if !**roll {
+                return false;
+            }
 
-    let mut accessible = 0;
-    for (pos, _) in warehouse.iter().filter(|(_, roll)| **roll) {
-        let surrounding = Direction::iter()
-            .filter(|&dir| {
-                let pos = pos + dir.into();
-                warehouse.get(pos).is_some_and(|roll| *roll)
-            })
-            .count();
-
-        if surrounding < 4 {
-            accessible += 1;
-        }
-    }
-
-    Ok(accessible)
+            Direction::iter()
+                .filter(|&dir| {
+                    let pos = *pos + dir.into();
+                    data.get(pos).is_some_and(|roll| *roll)
+                })
+                .count()
+                < 4
+        })
+        .count())
 }
 
 fn task2(data: &DataType) -> Result<ResultType> {
@@ -40,22 +39,27 @@ fn task2(data: &DataType) -> Result<ResultType> {
     let mut removed = 0;
 
     loop {
-        let mut removable = Vec::new();
+        let removable: Vec<Position> = warehouse
+            .iter()
+            .filter_map(|(pos, roll)| {
+                if !*roll {
+                    return None;
+                }
 
-        for (pos, _) in warehouse.iter().filter(|(_, roll)| **roll) {
-            //println!("{pos}");
-
-            let surrounding = Direction::iter()
-                .filter(|&dir| {
-                    let pos = pos + dir.into();
-                    warehouse.get(pos).is_some_and(|roll| *roll)
-                })
-                .count();
-
-            if surrounding < 4 {
-                removable.push(pos);
-            }
-        }
+                if Direction::iter()
+                    .filter(|&dir| {
+                        let pos = pos + dir.into();
+                        warehouse.get(pos).is_some_and(|roll| *roll)
+                    })
+                    .count()
+                    < 4
+                {
+                    Some(pos)
+                } else {
+                    None
+                }
+            })
+            .collect();
 
         if removable.is_empty() {
             break;
