@@ -4,7 +4,7 @@ For [AoC 2025](https://adventofcode.com/2025/) the number of problems has been r
 - [Day 1](src/bin/y25d01.rs) - Secret Entrance
 - [Day 2](src/bin/y25d02.rs) - Gift Shop
 - [Day 3](src/bin/y25d03.rs) - Lobby
-- Day 4
+- [Day 4](src/bin/y25d04.rs) - 
 - Day 5
 - Day 6
 - Day 7

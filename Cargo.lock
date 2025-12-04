@@ -68,7 +68,7 @@ name = "aoc"
 version = "0.1.0"
 dependencies = [
  "dotenvy",
- "nom",
+ "nom 7.1.3",
  "num_enum",
  "reqwest",
  "strum",
@@ -115,7 +115,7 @@ name = "aoc2020"
 version = "0.1.0"
 dependencies = [
  "aoc",
- "nom",
+ "nom 7.1.3",
 ]
 
 [[package]]
@@ -123,7 +123,7 @@ name = "aoc2021"
 version = "0.1.0"
 dependencies = [
  "aoc",
- "nom",
+ "nom 7.1.3",
 ]
 
 [[package]]
@@ -138,8 +138,8 @@ name = "aoc2023"
 version = "0.1.0"
 dependencies = [
  "aoc",
- "memoize",
- "nom",
+ "memoize 0.4.2",
+ "nom 7.1.3",
  "num",
  "rayon",
 ]
@@ -149,9 +149,9 @@ name = "aoc2024"
 version = "0.1.0"
 dependencies = [
  "aoc",
- "itertools",
- "memoize",
- "nom",
+ "itertools 0.13.0",
+ "memoize 0.4.2",
+ "nom 7.1.3",
  "rayon",
  "strum",
 ]
@@ -161,6 +161,11 @@ name = "aoc2025"
 version = "0.1.0"
 dependencies = [
  "aoc",
+ "itertools 0.14.0",
+ "memoize 0.5.1",
+ "nom 8.0.0",
+ "pathfinding",
+ "strum",
 ]
 
 [[package]]
@@ -291,6 +296,18 @@ name = "crossbeam-utils"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
+
+[[package]]
+name = "deprecate-until"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a3767f826efbbe5a5ae093920b58b43b01734202be697e1354914e862e8e704"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "semver",
+ "syn 2.0.111",
+]
 
 [[package]]
 name = "displaydoc"
@@ -648,6 +665,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "integer-sqrt"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "276ec31bcb4a9ee45f58bec6f9ec700ae4cf4f4f8f2fa7e06cb406bd5ffdd770"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "ipnet"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -674,6 +700,15 @@ name = "itertools"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
 dependencies = [
  "either",
 ]
@@ -753,7 +788,18 @@ checksum = "5df4051db13d0816cf23196d3baa216385ae099339f5d0645a8d9ff2305e82b8"
 dependencies = [
  "lazy_static",
  "lru",
- "memoize-inner",
+ "memoize-inner 0.4.3",
+]
+
+[[package]]
+name = "memoize"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8d1d5792299bab3f8b5d88d1b7a7cb50ad7ef039a8c4d45a6b84880a6526276"
+dependencies = [
+ "lazy_static",
+ "lru",
+ "memoize-inner 0.5.1",
 ]
 
 [[package]]
@@ -761,6 +807,18 @@ name = "memoize-inner"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27bdece7e91f0d1e33df7b46ec187a93ea0d4e642113a1039ac8bfdd4a3273ac"
+dependencies = [
+ "lazy_static",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "memoize-inner"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6dd8f89255d8ff313afabed9a3c83ef0993cc056679dfd001f5111a026f876f7"
 dependencies = [
  "lazy_static",
  "proc-macro2",
@@ -793,6 +851,15 @@ checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
 dependencies = [
  "memchr",
  "minimal-lexical",
+]
+
+[[package]]
+name = "nom"
+version = "8.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df9761775871bdef83bee530e60050f7e54b1105350d6884eb0fb4f46c2f9405"
+dependencies = [
+ "memchr",
 ]
 
 [[package]]
@@ -903,6 +970,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
+name = "pathfinding"
+version = "4.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59ac35caa284c08f3721fb33c2741b5f763decaf42d080c8a6a722154347017e"
+dependencies = [
+ "deprecate-until",
+ "indexmap",
+ "integer-sqrt",
+ "num-traits",
+ "rustc-hash",
+ "thiserror",
+]
+
+[[package]]
 name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1008,7 +1089,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1181,6 +1262,12 @@ name = "ryu"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28d3b2b1366ec20994f1fd18c3c594f05c5dd4bc44d8bb0c1c632c8d6829481f"
+
+[[package]]
+name = "semver"
+version = "1.0.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d767eb0aabc880b29956c35734170f26ed551a859dbd361d140cdbeca61ab1e2"
 
 [[package]]
 name = "serde"
