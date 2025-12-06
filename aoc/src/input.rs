@@ -26,7 +26,7 @@ impl AoCInput {
         if !resp.status().is_success() {
             Err(AoCError::FetchInput(resp.text()?))
         } else {
-            Ok(resp.text()?.trim().to_string())
+            Ok(resp.text()?.to_string())
         }
     }
 }
