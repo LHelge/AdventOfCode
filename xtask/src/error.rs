@@ -7,9 +7,6 @@ pub enum Error {
     #[error("Day {1}, {0} does have an Advent of Code problem")]
     InvalidDay(u16, u8),
 
-    #[error("Template not found")]
-    TemplateNotFound,
-
     #[error("Day {1}, {0} already exists")]
     AlreadyExists(u16, u8),
 
@@ -21,4 +18,7 @@ pub enum Error {
 
     #[error("Tests failed for day {1}, {0}")]
     TestsFailed(u16, u8),
+
+    #[error("Error rendering template: {0}")]
+    Askama(#[from] askama::Error),
 }

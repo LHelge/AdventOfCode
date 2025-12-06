@@ -1,15 +1,13 @@
 const YEAR: u16 = 2023;
 const DAY: u8 = 13;
 
-use std::fmt::Display;
-
-use aoc::*;
+use aoc::{utils::*, *};
 use nom::{
+    IResult,
     character::complete::{line_ending, one_of},
     multi::{many1, separated_list1},
-    IResult,
 };
-use vec2d::{Position, Vec2d};
+use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Material {

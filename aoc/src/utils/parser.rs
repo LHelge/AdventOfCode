@@ -1,4 +1,4 @@
-use super::error::*;
+use crate::error::*;
 use std::str::FromStr;
 
 pub trait Parser<T> {

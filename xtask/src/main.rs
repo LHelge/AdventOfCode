@@ -1,10 +1,11 @@
 use args::*;
+use askama::Template;
 use clap::Parser;
 use error::*;
 use std::env;
 use std::io::Write;
 use std::{
-    fs::{self, File},
+    fs::File,
     path::{Path, PathBuf},
 };
 
@@ -66,17 +67,25 @@ fn test_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
     Ok(())
 }
 
+#[derive(Template)]
+#[template(path = "day_template.rs", escape = "none")]
+struct DayTemplate {
+    year: u16,
+    day: u8,
+}
+
+impl DayTemplate {
+    fn new(year: u16, day: u8) -> Self {
+        DayTemplate { year, day }
+    }
+}
+
 fn new_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
     match (year, day) {
         (2025, 1..=12) => Ok(()),
         (2015..=2024, 1..=25) => Ok(()),
         (year, day) => Err(Error::InvalidDay(year, day)),
     }?;
-
-    let template = workspace_root.join("day_template.rs");
-    if !template.exists() {
-        return Err(Error::TemplateNotFound);
-    }
 
     let target = workspace_root
         .join(year.to_string())
@@ -87,10 +96,9 @@ fn new_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
         return Err(Error::AlreadyExists(year, day));
     }
 
-    let template = fs::read_to_string(template)?;
+    let template = DayTemplate::new(year, day);
+    let template = template.render()?;
     let mut output = File::create_new(target)?;
-    writeln!(output, "const YEAR: u16 = {year};")?;
-    writeln!(output, "const DAY: u8 = {day};")?;
     output.write_all(template.as_bytes())?;
 
     Ok(())

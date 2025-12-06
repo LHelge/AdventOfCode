@@ -1,3 +1,4 @@
+use crate::AoCError;
 use std::{
     fmt::Display,
     iter::Flatten,
@@ -6,27 +7,19 @@ use std::{
     str::FromStr,
 };
 use strum::EnumIter;
+use thiserror::Error;
 
-use crate::AoCError;
-
-#[derive(Debug)]
-pub enum Error {
+#[derive(Debug, Error)]
+pub enum Vec2dError {
+    #[error("The Vec2d is empty")]
     Empty,
+
+    #[error("The Vec2d is not square")]
     NotSquare,
+
+    #[error("The position is out of bounds")]
     OutOfBounds,
 }
-
-impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Error::Empty => write!(f, "The Vec2d is empty"),
-            Error::NotSquare => write!(f, "The Vec2d is not square"),
-            Error::OutOfBounds => write!(f, "The position is out of bounds"),
-        }
-    }
-}
-
-impl std::error::Error for Error {}
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Size {
@@ -249,7 +242,7 @@ impl TryFrom<char> for Direction {
             '>' => Ok(Self::East),
             'v' => Ok(Self::South),
             '<' => Ok(Self::West),
-            c => Err(AoCError::BadCharacter(c)),
+            c => Err(AoCError::UnexpectedCharacter(c)),
         }
     }
 }
@@ -263,7 +256,7 @@ pub struct Vec2d<T> {
 }
 
 impl<T> Vec2d<T> {
-    pub fn new(data: Vec<Vec<T>>) -> Result<Self, Error> {
+    pub fn new(data: Vec<Vec<T>>) -> Result<Self, Vec2dError> {
         if let Some(row) = data.first() {
             let size = Size {
                 width: row.len(),
@@ -271,14 +264,14 @@ impl<T> Vec2d<T> {
             };
 
             if data.iter().all(|row| row.is_empty()) {
-                Err(Error::Empty)
+                Err(Vec2dError::Empty)
             } else if data.iter().any(|row| row.len() != size.width) {
-                Err(Error::NotSquare)
+                Err(Vec2dError::NotSquare)
             } else {
                 Ok(Self { data, size })
             }
         } else {
-            Err(Error::Empty)
+            Err(Vec2dError::Empty)
         }
     }
 
@@ -298,9 +291,9 @@ impl<T> Vec2d<T> {
         self.data.get(pos.y)?.get(pos.x)
     }
 
-    pub fn set(&mut self, pos: Position, item: T) -> Result<(), Error> {
+    pub fn set(&mut self, pos: Position, item: T) -> Result<(), Vec2dError> {
         if !self.size.contains(pos) {
-            return Err(Error::OutOfBounds);
+            return Err(Vec2dError::OutOfBounds);
         }
 
         self.data[pos.y][pos.x] = item;
@@ -353,21 +346,21 @@ impl<T> Vec2d<T> {
         Self::new(transposed).unwrap()
     }
 
-    pub fn modify(&mut self, pos: Position, f: fn(&mut T)) -> Result<(), Error> {
+    pub fn modify(&mut self, pos: Position, f: fn(&mut T)) -> Result<(), Vec2dError> {
         if !self.size.contains(pos) {
-            return Err(Error::OutOfBounds);
+            return Err(Vec2dError::OutOfBounds);
         }
 
         f(&mut self.data[pos.y][pos.x]);
         Ok(())
     }
 
-    pub fn swap(&mut self, src: Position, dst: Position) -> Result<(), Error>
+    pub fn swap(&mut self, src: Position, dst: Position) -> Result<(), Vec2dError>
     where
         T: Copy,
     {
         if !self.size.contains(src) || !self.size.contains(dst) {
-            return Err(Error::OutOfBounds);
+            return Err(Vec2dError::OutOfBounds);
         }
 
         let tmp = self.data[src.y][src.x];

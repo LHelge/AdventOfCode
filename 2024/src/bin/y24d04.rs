@@ -1,6 +1,6 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 4;
-use aoc::vec2d::*;
+use aoc::utils::*;
 use aoc::*;
 use strum::IntoEnumIterator;
 

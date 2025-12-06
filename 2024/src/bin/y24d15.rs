@@ -1,10 +1,9 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 15;
 
-use std::fmt::Display;
-
+use aoc::utils::*;
 use aoc::*;
-use vec2d::{Direction, Position, Vec2d};
+use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Tile {
@@ -48,7 +47,7 @@ impl TryFrom<char> for Tile {
             '.' => Ok(Self::Empty),
             'O' => Ok(Self::Box),
             '@' => Ok(Self::Robot),
-            c => Err(AoCError::BadCharacter(c)),
+            c => Err(AoCError::UnexpectedCharacter(c)),
         }
     }
 }

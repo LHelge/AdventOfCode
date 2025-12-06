@@ -1,10 +1,9 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 8;
-use std::{collections::HashSet, fmt::Display};
-
+use aoc::utils::*;
 use aoc::*;
 use itertools::Itertools;
-use vec2d::{Position, Vec2d};
+use std::{collections::HashSet, fmt::Display};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Hash)]
 enum MapPoint {
