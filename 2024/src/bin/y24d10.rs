@@ -1,9 +1,9 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 10;
-use std::collections::{HashMap, HashSet};
 
+use aoc::utils::*;
 use aoc::*;
-use vec2d::{Direction, Position, Vec2d};
+use std::collections::{HashMap, HashSet};
 
 type Trail = Vec<Position>;
 type ResultType = usize;

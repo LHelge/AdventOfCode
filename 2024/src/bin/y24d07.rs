@@ -1,6 +1,6 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 7;
-use aoc::multiset::*;
+use aoc::utils::*;
 use aoc::*;
 use rayon::prelude::*;
 use std::{num::ParseIntError, str::FromStr};

@@ -1,9 +1,9 @@
 const YEAR: u16 = 2024;
 const DAY: u8 = 12;
-use std::collections::HashSet;
 
+use aoc::utils::*;
 use aoc::*;
-use vec2d::{Direction, Position, Vec2d};
+use std::collections::HashSet;
 
 const DIRECTIONS: [Direction; 4] = [
     Direction::North,

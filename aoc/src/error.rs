@@ -1,86 +1,49 @@
-use std::{
-    error::Error,
-    fmt::{Debug, Display},
-    num::ParseIntError,
-};
-
-use crate::intcode::IntCodeError;
+use std::num::ParseIntError;
+use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, AoCError>;
 
+#[derive(Debug, Error)]
 pub enum AoCError {
+    #[error("Bad input data from Advent of Code")]
     BadInput,
-    BadCharacter(char),
-    ParseIntError(ParseIntError),
-    CouldNotFetchInput(reqwest::Error),
+
+    #[error("Unexpected character {0} in input data")]
+    UnexpectedCharacter(char),
+
+    #[error(transparent)]
+    ParseIntError(#[from] ParseIntError),
+
+    #[error("Could not fetch input, check your SESSION environment variable: {0}")]
+    CouldNotFetchInput(#[from] reqwest::Error), // TODO: Remove this once all problems refactored to trait based solver
+
+    #[error("Task not solved yet")]
     Unsolved,
-    EnvironmentVariable(std::env::VarError),
+
+    #[error("Environment variable error: {0}")]
+    EnvironmentVariable(#[from] std::env::VarError),
+
+    #[error("Could not fetch input: {0}")]
     FetchInput(String),
+
+    #[error("Nom parser error")]
     Parser,
-    Vec2d(crate::vec2d::Error),
-    IntCode(IntCodeError),
-}
 
-impl Display for AoCError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            AoCError::BadInput => write!(f, "Bad input"),
-            AoCError::BadCharacter(c) => write!(f, "Bad character: {}", c),
-            AoCError::ParseIntError(e) => write!(f, "ParseIntError: {}", e),
-            AoCError::CouldNotFetchInput(e) => write!(
-                f,
-                "Could not fetch input, please check your SESSION environment variable. ({e})"
-            ),
-            AoCError::Unsolved => write!(f, "Task not solved yet"),
-            AoCError::EnvironmentVariable(e) => write!(f, "Environment variable error: {e}"),
-            AoCError::FetchInput(msg) => write!(f, "Could not fetch input: {msg}"),
-            AoCError::Parser => write!(f, "Parser error"),
-            AoCError::Vec2d(e) => write!(f, "Vec2d error: {e}"),
-            AoCError::IntCode(e) => write!(f, "Intcode error: {e}"),
-        }
-    }
-}
+    #[error(transparent)]
+    Vec2d(#[from] crate::utils::Vec2dError),
 
-impl Debug for AoCError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{self}")
-    }
-}
+    #[error(transparent)]
+    IntCode(#[from] crate::intcode::IntCodeError),
 
-impl Error for AoCError {}
+    #[error("The date {0} day {1} is not a valid AoC problem")]
+    InvalidDay(u16, u8),
 
-impl From<ParseIntError> for AoCError {
-    fn from(e: std::num::ParseIntError) -> Self {
-        AoCError::ParseIntError(e)
-    }
-}
-
-impl From<reqwest::Error> for AoCError {
-    fn from(e: reqwest::Error) -> Self {
-        AoCError::CouldNotFetchInput(e)
-    }
-}
-
-impl From<std::env::VarError> for AoCError {
-    fn from(e: std::env::VarError) -> Self {
-        AoCError::EnvironmentVariable(e)
-    }
+    #[error(transparent)]
+    Cache(#[from] crate::cache::CacheError),
 }
 
 impl<I> From<nom::error::Error<I>> for AoCError {
     fn from(_: nom::error::Error<I>) -> Self {
         AoCError::Parser
-    }
-}
-
-impl From<crate::vec2d::Error> for AoCError {
-    fn from(e: crate::vec2d::Error) -> Self {
-        AoCError::Vec2d(e)
-    }
-}
-
-impl From<crate::intcode::IntCodeError> for AoCError {
-    fn from(e: crate::intcode::IntCodeError) -> Self {
-        AoCError::IntCode(e)
     }
 }

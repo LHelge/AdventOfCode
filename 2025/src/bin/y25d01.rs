@@ -1,7 +1,7 @@
 const YEAR: u16 = 2025;
 const DAY: u8 = 1;
 
-use aoc::parser::Parser;
+use aoc::utils::Parser;
 use aoc::*;
 use std::ops::RangeInclusive;
 use std::str::FromStr;

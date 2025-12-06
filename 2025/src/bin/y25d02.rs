@@ -2,7 +2,7 @@ const YEAR: u16 = 2025;
 const DAY: u8 = 2;
 use std::{ops::RangeInclusive, str::FromStr};
 
-use aoc::{parser::Parser, *};
+use aoc::{utils::Parser, *};
 
 type ResultType = u64;
 type DataType = Vec<IdRange>;

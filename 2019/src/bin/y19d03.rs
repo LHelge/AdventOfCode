@@ -1,7 +1,7 @@
 const YEAR: u16 = 2019;
 const DAY: u8 = 3;
 
-use aoc::{parser::Parser, *};
+use aoc::{utils::*, *};
 use std::{
     collections::{HashMap, HashSet},
     str::FromStr,

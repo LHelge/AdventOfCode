@@ -1,12 +1,10 @@
+pub(crate) mod cache;
 mod error;
 mod input;
 pub mod intcode;
-pub mod multiset;
-pub mod pairs;
-pub mod parser;
-pub mod permute;
+pub mod problem;
 mod solution;
-pub mod vec2d;
+pub mod utils;
 
 pub use error::*;
 pub use input::*;

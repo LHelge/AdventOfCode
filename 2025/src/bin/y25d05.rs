@@ -1,7 +1,7 @@
 const YEAR: u16 = 2025;
 const DAY: u8 = 5;
 
-use aoc::{parser::Parser, *};
+use aoc::{utils::*, *};
 use std::{ops::RangeInclusive, str::FromStr};
 
 #[derive(Debug, Clone)]
