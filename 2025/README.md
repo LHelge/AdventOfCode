@@ -6,7 +6,7 @@ For [AoC 2025](https://adventofcode.com/2025/) the number of problems has been r
 - [Day 3](src/bin/y25d03.rs) - Lobby
 - [Day 4](src/bin/y25d04.rs) - Printing Department
 - [Day 5](src/bin/y25d05.rs) - Cafeteria
-- Day 6
+- [Day 6](src/bin/y25d06.rs) - Trash Compactor
 - Day 7
 - Day 8
 - Day 9
