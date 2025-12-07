@@ -25,7 +25,7 @@ fn task1(data: &DataType) -> Result<ResultType> {
 
             Direction::iter()
                 .filter(|&dir| {
-                    let pos = *pos + dir.into();
+                    let pos = *pos + dir;
                     data.get(pos).is_some_and(|roll| *roll)
                 })
                 .count()
@@ -48,7 +48,7 @@ fn task2(data: &DataType) -> Result<ResultType> {
 
                 if Direction::iter()
                     .filter(|&dir| {
-                        let pos = pos + dir.into();
+                        let pos = pos + dir;
                         warehouse.get(pos).is_some_and(|roll| *roll)
                     })
                     .count()

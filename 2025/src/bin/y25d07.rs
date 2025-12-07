@@ -7,7 +7,6 @@ enum Entry {
     #[default]
     EmptySpace,
     Manifold,
-    Beam,
 }
 
 impl TryFrom<char> for Entry {
@@ -39,46 +38,46 @@ impl AoCProblem<usize, usize> for Problem {
     }
 
     fn part1(&self) -> Result<usize> {
-        let mut diagram = self.diagram.clone();
-        let mut splits = 0;
+        let (start, _) = self.diagram.find(&Entry::Start).ok_or(AoCError::BadInput)?;
 
-        let (start, _) = diagram.find(&Entry::Start).ok_or(AoCError::BadInput)?;
-        diagram.set(start + Direction::South.into(), Entry::Beam)?;
+        let mut beams: HashSet<usize> = HashSet::new();
+        beams.insert(start.x);
 
-        for row in (start.y + 1)..diagram.height() {
-            let mut beams: HashSet<Position> = HashSet::new();
-
-            for (pos, entry) in diagram.iter_row(row) {
-                let above = pos + Direction::North.into();
-
-                if diagram.get(above).is_some_and(|e| *e == Entry::Beam) {
-                    match entry {
-                        Entry::EmptySpace => beams.insert(pos),
-                        Entry::Manifold => {
-                            splits += 1;
-                            beams.insert(pos + Direction::East.into());
-                            beams.insert(pos + Direction::West.into())
-                        }
-                        _ => Err(AoCError::BadInput)?,
-                    };
-                }
-            }
-
-            for pos in beams {
-                diagram.set(pos, Entry::Beam)?;
-            }
-        }
-
-        Ok(splits)
+        count_splits(&self.diagram, start.y + 1, beams)
     }
 
     fn part2(&self) -> Result<usize> {
-        let (beam, _) = self.diagram.find(&Entry::Start).ok_or(AoCError::BadInput)?;
+        let (start, _) = self.diagram.find(&Entry::Start).ok_or(AoCError::BadInput)?;
+        let beam = start + Direction::South;
 
         let mut cache: HashMap<Position, usize> = HashMap::new();
 
         count_timelines(&self.diagram, beam, &mut cache)
     }
+}
+
+fn count_splits(diagram: &Vec2d<Entry>, line: usize, beams: HashSet<usize>) -> Result<usize> {
+    if line >= diagram.height() {
+        return Ok(0);
+    }
+
+    let mut new_beams = HashSet::new();
+    let mut splits = 0;
+
+    for beam in beams {
+        let pos = Position::new(beam, line);
+        match diagram.get(pos) {
+            Some(Entry::EmptySpace) => new_beams.insert(pos.x),
+            Some(Entry::Manifold) => {
+                splits += 1;
+                new_beams.insert(pos.x - 1);
+                new_beams.insert(pos.x + 1)
+            }
+            _ => Err(AoCError::BadInput)?,
+        };
+    }
+
+    Ok(count_splits(diagram, line + 1, new_beams)? + splits)
 }
 
 fn count_timelines(
@@ -90,16 +89,16 @@ fn count_timelines(
         return Ok(*timelines);
     }
 
-    let below = pos + Direction::South.into();
+    let below = pos + Direction::South;
 
     let timelines = match diagram.get(below) {
         Some(Entry::EmptySpace) => count_timelines(diagram, below, cache)?,
         Some(Entry::Manifold) => {
-            count_timelines(diagram, below + Direction::East.into(), cache)?
-                + count_timelines(diagram, below + Direction::West.into(), cache)?
+            count_timelines(diagram, below + Direction::East, cache)?
+                + count_timelines(diagram, below + Direction::West, cache)?
         }
         None => 1,
-        _ => panic!("ooooh"),
+        _ => Err(AoCError::BadInput)?,
     };
 
     cache.insert(pos, timelines);

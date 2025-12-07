@@ -41,7 +41,7 @@ impl Region {
         let mut perimeter = 0;
         for &position in self.positions.iter() {
             for direction in DIRECTIONS {
-                let neighbour = position + direction.into();
+                let neighbour = position + direction;
                 if !self.contains(&neighbour) {
                     perimeter += 1;
                 }
@@ -55,10 +55,10 @@ impl Region {
         let mut corners = 0;
 
         for &position in self.positions.iter() {
-            let north = position + Direction::North.into();
-            let east = position + Direction::East.into();
-            let south = position + Direction::South.into();
-            let west = position + Direction::West.into();
+            let north = position + Direction::North;
+            let east = position + Direction::East;
+            let south = position + Direction::South;
+            let west = position + Direction::West;
 
             // Outer corners
             if !self.contains(&north) && !self.contains(&west) {
@@ -74,10 +74,10 @@ impl Region {
                 corners += 1;
             }
 
-            let north_east = position + Direction::NorthEast.into();
-            let north_west = position + Direction::NorthWest.into();
-            let south_east = position + Direction::SouthEast.into();
-            let south_west = position + Direction::SouthWest.into();
+            let north_east = position + Direction::NorthEast;
+            let north_west = position + Direction::NorthWest;
+            let south_east = position + Direction::SouthEast;
+            let south_west = position + Direction::SouthWest;
 
             // Inner corners
             if self.contains(&north) && self.contains(&east) && !self.contains(&north_east) {
@@ -110,7 +110,7 @@ fn find_region(map: &Vec2d<char>, position: Position, region: &mut Region) {
     ];
 
     for direction in DIRECTIONS {
-        let neighbour = position + direction.into();
+        let neighbour = position + direction;
         if let Some(&id) = map.get(neighbour)
             && id == region.id
             && !region.contains(&neighbour)

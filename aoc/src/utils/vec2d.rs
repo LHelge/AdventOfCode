@@ -96,6 +96,14 @@ impl Add<Distance> for Position {
     }
 }
 
+impl Add<Direction> for Position {
+    type Output = Self;
+
+    fn add(self, rhs: Direction) -> Self::Output {
+        self + Distance::from(rhs)
+    }
+}
+
 impl Sub<Distance> for Position {
     type Output = Self;
 
@@ -115,6 +123,14 @@ impl Sub<Position> for Position {
             dx: self.x as isize - other.x as isize,
             dy: self.y as isize - other.y as isize,
         }
+    }
+}
+
+impl Sub<Direction> for Position {
+    type Output = Position;
+
+    fn sub(self, rhs: Direction) -> Self::Output {
+        self - Distance::from(rhs)
     }
 }
 
