@@ -105,7 +105,7 @@ impl Warehouse {
     }
 
     fn move_robot(&mut self, direction: Direction) {
-        let new_pos = self.robot + direction.into();
+        let new_pos = self.robot + direction;
 
         match self.map.get(new_pos) {
             Some(Tile::Empty) => {
@@ -125,7 +125,7 @@ impl Warehouse {
     }
 
     fn can_be_pushed(&self, pos: Position, direction: Direction) -> bool {
-        let new_space = pos + direction.into();
+        let new_space = pos + direction;
 
         match (direction, self.map.get(pos)) {
             (_, Some(Tile::Box)) => {
@@ -144,7 +144,7 @@ impl Warehouse {
                 if !matches!(self.map.get(new_space), Some(Tile::BoxWest)) {
                     unreachable!("The box have been split some way");
                 }
-                let new_space = new_space + direction.into();
+                let new_space = new_space + direction;
 
                 match self.map.get(new_space) {
                     Some(Tile::Empty) => true,
@@ -160,7 +160,7 @@ impl Warehouse {
                 if !matches!(self.map.get(new_space), Some(Tile::BoxEast)) {
                     unreachable!("The box have been split some way");
                 }
-                let new_space = new_space + direction.into();
+                let new_space = new_space + direction;
 
                 match self.map.get(new_space) {
                     Some(Tile::Empty) => true,
@@ -173,15 +173,12 @@ impl Warehouse {
             (dir, Some(Tile::BoxEast)) if dir.is_north_south() => {
                 // Pushing the eastern part of a wide box to the north or south
 
-                if !matches!(
-                    self.map.get(pos + Direction::West.into()),
-                    Some(Tile::BoxWest)
-                ) {
+                if !matches!(self.map.get(pos + Direction::West), Some(Tile::BoxWest)) {
                     unreachable!("The box have been split some way");
                 }
 
                 let new_space_east = new_space;
-                let new_space_west = new_space + Direction::West.into();
+                let new_space_west = new_space + Direction::West;
 
                 match (self.map.get(new_space_west), self.map.get(new_space_east)) {
                     (Some(Tile::Empty), Some(Tile::Empty)) => true,
@@ -203,14 +200,11 @@ impl Warehouse {
             (dir, Some(Tile::BoxWest)) if dir.is_north_south() => {
                 // Pushing the western part of a wide box to the north or south
 
-                if !matches!(
-                    self.map.get(pos + Direction::East.into()),
-                    Some(Tile::BoxEast)
-                ) {
+                if !matches!(self.map.get(pos + Direction::East), Some(Tile::BoxEast)) {
                     unreachable!("The box have been split some way");
                 }
 
-                let new_space_east = new_space + Direction::East.into();
+                let new_space_east = new_space + Direction::East;
                 let new_space_west = new_space;
 
                 match (self.map.get(new_space_west), self.map.get(new_space_east)) {
@@ -237,7 +231,7 @@ impl Warehouse {
     fn push_box(&mut self, pos: Position, direction: Direction) {
         match (direction, self.map.get(pos)) {
             (_, Some(Tile::Box)) => {
-                let new_space = pos + direction.into();
+                let new_space = pos + direction;
                 match self.map.get(new_space) {
                     Some(Tile::Empty) => {
                         self.map.swap(pos, new_space).unwrap();
@@ -250,16 +244,16 @@ impl Warehouse {
                 }
             }
             (dir, Some(tile)) if dir.is_east_west() && tile.is_wide_box() => {
-                let new_space = pos + dir.into() + dir.into();
+                let new_space = pos + dir + dir;
                 match self.map.get(new_space) {
                     Some(Tile::Empty) => {
-                        self.map.swap(pos + dir.into(), new_space).unwrap();
-                        self.map.swap(pos, pos + dir.into()).unwrap();
+                        self.map.swap(pos + dir, new_space).unwrap();
+                        self.map.swap(pos, pos + dir).unwrap();
                     }
                     Some(tile) if tile.is_box() => {
                         self.push_box(new_space, direction);
-                        self.map.swap(pos + dir.into(), new_space).unwrap();
-                        self.map.swap(pos, pos + dir.into()).unwrap();
+                        self.map.swap(pos + dir, new_space).unwrap();
+                        self.map.swap(pos, pos + dir).unwrap();
                     }
                     _ => unreachable!("You are pushing into something"),
                 }
@@ -267,9 +261,9 @@ impl Warehouse {
             (dir, Some(Tile::BoxWest)) if dir.is_north_south() => {
                 // Pushing the western part of a wide box to the north or south
                 let pos_west = pos;
-                let pos_east = pos + Direction::East.into();
-                let new_space_west = pos_west + dir.into();
-                let new_space_east = pos_east + dir.into();
+                let pos_east = pos + Direction::East;
+                let new_space_west = pos_west + dir;
+                let new_space_east = pos_east + dir;
 
                 match (self.map.get(new_space_west), self.map.get(new_space_east)) {
                     (Some(Tile::Empty), Some(Tile::Empty)) => {
@@ -303,10 +297,10 @@ impl Warehouse {
             }
             (dir, Some(Tile::BoxEast)) if dir.is_north_south() => {
                 // Pushing the eastern part of a wide box to the north or south
-                let pos_west = pos + Direction::West.into();
+                let pos_west = pos + Direction::West;
                 let pos_east = pos;
-                let new_space_west = pos_west + dir.into();
-                let new_space_east = pos_east + dir.into();
+                let new_space_west = pos_west + dir;
+                let new_space_east = pos_east + dir;
 
                 match (self.map.get(new_space_west), self.map.get(new_space_east)) {
                     (Some(Tile::Empty), Some(Tile::Empty)) => {

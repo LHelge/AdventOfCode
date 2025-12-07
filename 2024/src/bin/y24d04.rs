@@ -26,13 +26,13 @@ impl Xmas for Vec2d<char> {
         let mut w1 = [char::default(); 3];
         let mut w2 = [char::default(); 3];
 
-        w1[0] = *self.get(position + Direction::NorthWest.into())?;
+        w1[0] = *self.get(position + Direction::NorthWest)?;
         w1[1] = *self.get(position)?;
-        w1[2] = *self.get(position + Direction::SouthEast.into())?;
+        w1[2] = *self.get(position + Direction::SouthEast)?;
 
-        w2[0] = *self.get(position + Direction::NorthEast.into())?;
+        w2[0] = *self.get(position + Direction::NorthEast)?;
         w2[1] = w1[1];
-        w2[2] = *self.get(position + Direction::SouthWest.into())?;
+        w2[2] = *self.get(position + Direction::SouthWest)?;
 
         Some((w1, w2))
     }

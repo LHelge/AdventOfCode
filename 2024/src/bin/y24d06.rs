@@ -40,11 +40,11 @@ struct Map {
 
 impl Map {
     fn move_guard(&mut self) -> Result<()> {
-        let mut new_position = self.guard.position + self.guard.direction.into();
+        let mut new_position = self.guard.position + self.guard.direction;
 
         while matches!(self.map.get(new_position), Some(MapPoint::Obstruction)) {
             self.guard.direction = self.guard.direction.turn_cv().turn_cv();
-            new_position = self.guard.position + self.guard.direction.into();
+            new_position = self.guard.position + self.guard.direction;
         }
 
         self.guard.position = new_position;

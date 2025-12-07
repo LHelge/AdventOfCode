@@ -23,7 +23,7 @@ fn find_trails(map: &Vec2d<u8>, trail: &mut Trail) -> Vec<Trail> {
     if let Some(&pos) = trail.last() {
         if let Some(&tile) = map.get(pos) {
             for &dir in DIRECTIONS.iter() {
-                let next = pos + dir.into();
+                let next = pos + dir;
 
                 if let Some(&next_tile) = map.get(next) {
                     if next_tile == tile + 1 {
