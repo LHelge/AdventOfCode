@@ -325,6 +325,28 @@ impl<T> Vec2d<T> {
         }
     }
 
+    pub fn iter_row(&self, row: usize) -> Vec2dRowIter<'_, T> {
+        Vec2dRowIter {
+            vec2d: self,
+            current: Position::new(0, row),
+        }
+    }
+
+    pub fn iter_row_mut(&mut self, row: usize) -> Vec2dRowIterMut<'_, T> {
+        Vec2dRowIterMut {
+            iter: self.data[row].iter_mut(),
+            row,
+            col: 0,
+        }
+    }
+
+    pub fn iter_col(&self, col: usize) -> Vec2dColIter<'_, T> {
+        Vec2dColIter {
+            vec2d: self,
+            current: Position::new(col, 0),
+        }
+    }
+
     pub fn data(&self) -> &Vec<Vec<T>> {
         &self.data
     }
@@ -405,6 +427,63 @@ impl<'a, T> Iterator for Vec2dIter<'a, T> {
             }
 
             Some((pos, self.vec2d.get(pos).unwrap()))
+        } else {
+            None
+        }
+    }
+}
+
+pub struct Vec2dRowIter<'a, T> {
+    vec2d: &'a Vec2d<T>,
+    current: Position,
+}
+
+impl<'a, T> Iterator for Vec2dRowIter<'a, T> {
+    type Item = (Position, &'a T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current.x < self.vec2d.width() {
+            let pos = self.current;
+            self.current.x += 1;
+
+            Some((pos, self.vec2d.get(pos)?))
+        } else {
+            None
+        }
+    }
+}
+
+pub struct Vec2dRowIterMut<'a, T> {
+    iter: slice::IterMut<'a, T>,
+    row: usize,
+    col: usize,
+}
+
+impl<'a, T> Iterator for Vec2dRowIterMut<'a, T> {
+    type Item = (Position, &'a mut T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.iter.next()?;
+        let pos = Position::new(self.col, self.row);
+        self.col += 1;
+        Some((pos, item))
+    }
+}
+
+pub struct Vec2dColIter<'a, T> {
+    vec2d: &'a Vec2d<T>,
+    current: Position,
+}
+
+impl<'a, T> Iterator for Vec2dColIter<'a, T> {
+    type Item = (Position, &'a T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current.y < self.vec2d.height() {
+            let pos = self.current;
+            self.current.y += 1;
+
+            Some((pos, self.vec2d.get(pos)?))
         } else {
             None
         }
@@ -527,6 +606,72 @@ mod tests {
         assert_eq!(vec2d.get(Position::new(1, 1)), Some(&5));
         assert_eq!(vec2d.get(Position::new(2, 2)), Some(&9));
         assert_eq!(vec2d.get(Position::new(3, 4)), None);
+    }
+
+    #[test]
+    fn test_vec2d_iter_row() {
+        let data = vec![
+            vec![1, 2, 3],
+            vec![4, 5, 6],
+            vec![7, 8, 9],
+            vec![10, 12, 12],
+        ];
+
+        let vec2d = Vec2d::new(data).unwrap();
+        let mut iter = vec2d.iter_row(1);
+
+        assert_eq!(iter.next(), Some((Position::new(0, 1), &4)));
+        assert_eq!(iter.next(), Some((Position::new(1, 1), &5)));
+        assert_eq!(iter.next(), Some((Position::new(2, 1), &6)));
+        assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn test_vec2d_iter_row_mut() {
+        let data = vec![
+            vec![1, 2, 3],
+            vec![4, 5, 6],
+            vec![7, 8, 9],
+            vec![10, 11, 12],
+        ];
+
+        let mut vec2d = Vec2d::new(data).unwrap();
+
+        for (_, item) in vec2d.iter_row_mut(1) {
+            *item *= 2;
+        }
+
+        assert_eq!(vec2d.get(Position::new(0, 0)), Some(&1));
+        assert_eq!(vec2d.get(Position::new(1, 0)), Some(&2));
+        assert_eq!(vec2d.get(Position::new(2, 0)), Some(&3));
+        assert_eq!(vec2d.get(Position::new(0, 1)), Some(&8));
+        assert_eq!(vec2d.get(Position::new(1, 1)), Some(&10));
+        assert_eq!(vec2d.get(Position::new(2, 1)), Some(&12));
+        assert_eq!(vec2d.get(Position::new(0, 2)), Some(&7));
+        assert_eq!(vec2d.get(Position::new(1, 2)), Some(&8));
+        assert_eq!(vec2d.get(Position::new(2, 2)), Some(&9));
+        assert_eq!(vec2d.get(Position::new(0, 3)), Some(&10));
+        assert_eq!(vec2d.get(Position::new(1, 3)), Some(&11));
+        assert_eq!(vec2d.get(Position::new(2, 3)), Some(&12));
+    }
+
+    #[test]
+    fn test_vec2d_iter_col() {
+        let data = vec![
+            vec![1, 2, 3],
+            vec![4, 5, 6],
+            vec![7, 8, 9],
+            vec![10, 12, 12],
+        ];
+
+        let vec2d = Vec2d::new(data).unwrap();
+        let mut iter = vec2d.iter_col(1);
+
+        assert_eq!(iter.next(), Some((Position::new(1, 0), &2)));
+        assert_eq!(iter.next(), Some((Position::new(1, 1), &5)));
+        assert_eq!(iter.next(), Some((Position::new(1, 2), &8)));
+        assert_eq!(iter.next(), Some((Position::new(1, 3), &12)));
+        assert_eq!(iter.next(), None);
     }
 
     #[test]
