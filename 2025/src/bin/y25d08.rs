@@ -1,19 +1,26 @@
+use aoc::{problem::*, utils::*, *};
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
+    fmt::Display,
     hash::Hash,
+    ops::Sub,
     str::FromStr,
 };
 
-use aoc::{problem::*, utils::*, *};
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-struct Position {
+struct JunctionBox {
     x: i64,
     y: i64,
     z: i64,
 }
 
-impl FromStr for Position {
+impl Display for JunctionBox {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({},{},{})", self.x, self.y, self.z)
+    }
+}
+
+impl FromStr for JunctionBox {
     type Err = AoCError;
 
     fn from_str(s: &str) -> Result<Self> {
@@ -23,91 +30,124 @@ impl FromStr for Position {
         let y = s.next().ok_or(AoCError::BadInput)?.parse()?;
         let z = s.next().ok_or(AoCError::BadInput)?.parse()?;
 
-        Ok(Position::new(x, y, z))
-    }
-}
-
-impl Position {
-    fn new(x: i64, y: i64, z: i64) -> Self {
-        Position { x, y, z }
-    }
-
-    fn distance_to(&self, other: &Position) -> f64 {
-        let x = self.x.abs_diff(other.x) as f64;
-        let y = self.y.abs_diff(other.y) as f64;
-        let z = self.z.abs_diff(other.z) as f64;
-
-        (x.powi(2) + y.powi(2) + z.powi(2)).sqrt()
-    }
-}
-
-#[derive(Debug, Clone, Copy, Eq)]
-struct JunctionBox {
-    pos: Position,
-    circuit: Option<usize>,
-}
-
-impl FromStr for JunctionBox {
-    type Err = AoCError;
-
-    fn from_str(s: &str) -> Result<Self> {
-        Ok(JunctionBox::new(s.parse()?))
-    }
-}
-
-impl Hash for JunctionBox {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.pos.hash(state);
-    }
-}
-
-impl PartialEq for JunctionBox {
-    fn eq(&self, other: &Self) -> bool {
-        self.pos.eq(&other.pos)
+        Ok(Self::new(x, y, z))
     }
 }
 
 impl JunctionBox {
-    fn new(pos: Position) -> Self {
-        Self { pos, circuit: None }
+    fn new(x: i64, y: i64, z: i64) -> Self {
+        Self { x, y, z }
+    }
+
+    fn distance_to_squared(&self, other: &JunctionBox) -> i64 {
+        self.x.sub(other.x).pow(2) + self.y.sub(other.y).pow(2) + self.z.sub(other.z).pow(2)
     }
 }
 
-struct JuctionBoxSet(HashSet<JunctionBox>);
+#[derive(Debug, Default)]
+struct Circuit(HashSet<JunctionBox>);
 
-impl JuctionBoxSet {
-    fn connect(&mut self, box1: JunctionBox, box2: JuctionBox) {
-        
+impl Circuit {
+    fn new(jb: JunctionBox) -> Self {
+        let mut set = HashSet::new();
+        set.insert(jb);
+        Circuit(set)
+    }
+    fn contains(&self, value: &JunctionBox) -> bool {
+        self.0.contains(value)
+    }
+
+    fn merge(mut self, other: Circuit) -> Circuit {
+        self.0.extend(other.0);
+        Circuit(self.0)
+    }
+
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+}
+
+#[derive(Debug, Default)]
+struct Circuits(Vec<Circuit>);
+
+impl Circuits {
+    fn connect(&mut self, b1: JunctionBox, b2: JunctionBox) {
+        let c1 = if let Some(index) = self.0.iter().position(|c| c.contains(&b1)) {
+            self.0.swap_remove(index)
+        } else {
+            Circuit::new(b1)
+        };
+
+        let c2 = if let Some(index) = self.0.iter().position(|c| c.contains(&b2)) {
+            self.0.swap_remove(index)
+        } else {
+            Circuit::new(b2)
+        };
+        self.0.push(c1.merge(c2));
+    }
+
+    fn calc_part1(&self) -> usize {
+        let mut tmp: Vec<usize> = self.0.iter().map(|c| c.len()).collect();
+        tmp.sort();
+        //dbg!(&tmp);
+        tmp.iter().rev().take(3).product()
+    }
+
+    fn len(&self) -> usize {
+        self.0.len()
     }
 }
 
 #[derive(Default)]
 struct Problem {
-    boxes: HashSet<JunctionBox>,
+    boxes: Vec<JunctionBox>,
+    distances: BTreeMap<i64, (JunctionBox, JunctionBox)>,
 }
 
-impl Problem {
-    fn connect(&mut self)
-}
-
-impl AoCProblem<u64, u64> for Problem {
+impl AoCProblem<usize, i64> for Problem {
     fn date() -> Date {
         Date::new(2025, 8).unwrap()
     }
 
     fn parse(&mut self, input: &str) -> Result<()> {
-        let positions: Vec<Position> = input.parse_lines()?;
-        self.boxes = positions.iter().map(|pos| JunctionBox::new(*pos)).collect();
+        self.boxes = input.parse_lines()?;
+
+        for (b1, b2) in self.boxes.pairs() {
+            self.distances.insert(b1.distance_to_squared(&b2), (b1, b2));
+        }
+
         Ok(())
     }
 
-    fn part1(&self) -> Result<u64> {
-        let mut boxes = self.boxes.clone();
+    fn part1(&self) -> Result<usize> {
+        let mut circuits = Circuits::default();
 
-        for _ in 0..10 {
-            let closest
+        #[cfg(not(test))]
+        let iterations = 1000;
+        #[cfg(test)]
+        let iterations = 10;
 
+        for (b1, b2) in self.distances.values().take(iterations) {
+            circuits.connect(*b1, *b2);
         }
+
+        Ok(circuits.calc_part1())
+    }
+
+    fn part2(&self) -> Result<i64> {
+        let mut circuits = Circuits::default();
+
+        let mut distance = 0;
+        for (b1, b2) in self.distances.values() {
+            circuits.connect(*b1, *b2);
+
+            if circuits.len() == 1 && circuits.0[0].len() == self.boxes.len() {
+                distance = b1.x * b2.x;
+                break;
+            }
+        }
+
+        Ok(distance)
     }
 }
 
@@ -150,5 +190,6 @@ mod tests {
         let mut problem = Problem::default();
         problem.parse(input).unwrap();
         problem.test_part1(40);
+        problem.test_part2(25272);
     }
 }
