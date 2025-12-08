@@ -1,7 +1,6 @@
 use aoc::{problem::*, utils::*, *};
 use std::{
     collections::{BTreeMap, HashSet},
-    fmt::Display,
     hash::Hash,
     ops::Sub,
     str::FromStr,
@@ -12,12 +11,6 @@ struct JunctionBox {
     x: i64,
     y: i64,
     z: i64,
-}
-
-impl Display for JunctionBox {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({},{},{})", self.x, self.y, self.z)
-    }
 }
 
 impl FromStr for JunctionBox {
@@ -53,6 +46,7 @@ impl Circuit {
         set.insert(jb);
         Circuit(set)
     }
+
     fn contains(&self, value: &JunctionBox) -> bool {
         self.0.contains(value)
     }
@@ -86,13 +80,6 @@ impl Circuits {
         self.0.push(c1.merge(c2));
     }
 
-    fn calc_part1(&self) -> usize {
-        let mut tmp: Vec<usize> = self.0.iter().map(|c| c.len()).collect();
-        tmp.sort();
-        //dbg!(&tmp);
-        tmp.iter().rev().take(3).product()
-    }
-
     fn len(&self) -> usize {
         self.0.len()
     }
@@ -112,6 +99,7 @@ impl AoCProblem<usize, i64> for Problem {
     fn parse(&mut self, input: &str) -> Result<()> {
         self.boxes = input.parse_lines()?;
 
+        self.distances.clear();
         for (b1, b2) in self.boxes.pairs() {
             self.distances.insert(b1.distance_to_squared(&b2), (b1, b2));
         }
@@ -131,23 +119,23 @@ impl AoCProblem<usize, i64> for Problem {
             circuits.connect(*b1, *b2);
         }
 
-        Ok(circuits.calc_part1())
+        let mut circuit_size: Vec<usize> = circuits.0.iter().map(|c| c.len()).collect();
+        circuit_size.sort();
+        Ok(circuit_size.iter().rev().take(3).product())
     }
 
     fn part2(&self) -> Result<i64> {
         let mut circuits = Circuits::default();
 
-        let mut distance = 0;
         for (b1, b2) in self.distances.values() {
             circuits.connect(*b1, *b2);
 
             if circuits.len() == 1 && circuits.0[0].len() == self.boxes.len() {
-                distance = b1.x * b2.x;
-                break;
+                return Ok(b1.x * b2.x);
             }
         }
 
-        Ok(distance)
+        Err(AoCError::BadInput)
     }
 }
 
