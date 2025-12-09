@@ -1,9 +1,87 @@
 use aoc::{problem::*, utils::*, *};
-use std::collections::HashSet;
+
+#[derive(Debug)]
+enum Line {
+    Horizontal {
+        x1: usize,
+        x2: usize,
+        y: usize,
+    },
+    Vertical {
+        x: usize,
+        y1: usize,
+        y2: usize,
+    },
+    #[allow(unused)]
+    Other {
+        topleft: Position,
+        bottomright: Position,
+    },
+}
+
+impl Line {
+    fn new(p1: Position, p2: Position) -> Self {
+        if p1.x == p2.x {
+            let x = p1.x;
+            let y1 = p1.y.min(p2.y);
+            let y2 = p1.y.max(p2.y);
+            Line::Vertical { x, y1, y2 }
+        } else if p1.y == p2.y {
+            let x1 = p1.x.min(p2.x);
+            let x2 = p1.x.max(p2.x);
+            let y = p1.y;
+            Line::Horizontal { x1, x2, y }
+        } else {
+            let topleft = Position::new(p1.x.min(p2.x), p1.y.min(p2.y));
+            let bottomright = Position::new(p1.x.max(p2.x), p1.y.max(p2.y));
+            Line::Other {
+                topleft,
+                bottomright,
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+struct Rectangle(Position, Position);
+
+impl Rectangle {
+    fn new(p1: Position, p2: Position) -> Self {
+        let topleft = Position::new(p1.x.min(p2.x), p1.y.min(p2.y));
+        let bottomright = Position::new(p1.x.max(p2.x), p1.y.max(p2.y));
+        Self(topleft, bottomright)
+    }
+
+    fn size(&self) -> usize {
+        (self.0.x.abs_diff(self.1.x) + 1) * (self.0.y.abs_diff(self.1.y) + 1)
+    }
+
+    fn intersects(&self, line: &Line) -> bool {
+        match line {
+            Line::Horizontal { x1, x2, y } => {
+                *y > self.0.y && *y < self.1.y && *x1 < self.1.x && *x2 > self.0.x
+            }
+            Line::Vertical { x, y1, y2 } => {
+                *x > self.0.x && *x < self.1.x && *y1 < self.1.y && *y2 > self.0.y
+            }
+            Line::Other { .. } => unimplemented!("Not required here!"),
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+struct Polygon(Vec<Line>);
+
+impl Polygon {
+    fn contains(&self, rect: &Rectangle) -> bool {
+        !self.0.iter().any(|line| rect.intersects(line))
+    }
+}
 
 #[derive(Default)]
 struct Problem {
-    tiles: Vec<Position>,
+    rectangles: Vec<Rectangle>,
+    polygon: Polygon,
 }
 
 impl AoCProblem<usize, usize> for Problem {
@@ -12,95 +90,42 @@ impl AoCProblem<usize, usize> for Problem {
     }
 
     fn parse(&mut self, input: &str) -> Result<()> {
-        self.tiles = input.parse_lines()?;
+        let tiles = input.parse_lines()?;
+
+        self.rectangles = tiles
+            .pairs()
+            .map(|(p1, p2)| Rectangle::new(p1, p2))
+            .collect();
+        self.rectangles.sort_by_key(|r| r.size());
+        self.rectangles.reverse();
+
+        let mut lines: Vec<Line> = tiles
+            .as_slice()
+            .windows(2)
+            .map(|w| Line::new(w[0], w[1]))
+            .collect();
+
+        // Close the polygon
+        let start = tiles.first().ok_or(AoCError::BadInput)?;
+        let end = tiles.last().ok_or(AoCError::BadInput)?;
+        lines.push(Line::new(*start, *end));
+
+        self.polygon = Polygon(lines);
+
         Ok(())
     }
 
     fn part1(&self) -> Result<usize> {
-        let mut largest = 0;
-
-        for (t1, t2) in self.tiles.pairs() {
-            let size = (t1.x.abs_diff(t2.x) + 1) * (t1.y.abs_diff(t2.y) + 1);
-
-            largest = largest.max(size);
-        }
-
-        Ok(largest)
+        Ok(self.rectangles.first().ok_or(AoCError::BadInput)?.size())
     }
 
     fn part2(&self) -> Result<usize> {
-        let mut red_green: HashSet<Position> = HashSet::new();
-
-        let mut xmin = usize::MAX;
-        let mut xmax = 0;
-        let mut ymin = usize::MAX;
-        let mut ymax = 0;
-
-        for w in self.tiles.as_slice().windows(2) {
-            let t1 = w[0];
-            let t2 = w[1];
-            red_green.insert(t1);
-            red_green.insert(t2);
-            if t1.x == t2.x {
-                let x = t1.x;
-                for y in t1.y.min(t2.y)..=t1.y.max(t2.y) {
-                    xmin = xmin.min(x);
-                    ymin = ymin.min(y);
-                    xmax = xmax.max(x);
-                    ymax = ymax.max(y);
-                    let t3 = Position::new(x, y);
-                    red_green.insert(t3);
-                }
-            } else if t1.y == t2.y {
-                let y = t1.y;
-                for x in t1.x.min(t2.x)..=t1.x.max(t2.x) {
-                    xmin = xmin.min(x);
-                    ymin = ymin.min(y);
-                    xmax = xmax.max(x);
-                    ymax = ymax.max(y);
-                    let t3 = Position::new(x, y);
-                    red_green.insert(t3);
-                }
-            } else {
-                Err(AoCError::BadInput)?
-            }
-        }
-
-        for y in 0..=ymax {
-            let mut set = false;
-            for x in 0..=xmax {
-                let p = Position::new(x, y);
-                if red_green.contains(&p) {
-                    set = !set;
-                }
-
-                if set {
-                    red_green.insert(p);
-                    print!("#");
-                } else {
-                    print!(".");
-                }
-            }
-            println!("");
-        }
-
-        let mut largest = 0;
-
-        'outer: for (t1, t2) in self.tiles.pairs() {
-            let size = (t1.x.abs_diff(t2.x) + 1) * (t1.y.abs_diff(t2.y) + 1);
-
-            for x in t1.x.min(t2.x)..=t1.x.max(t2.x) {
-                for y in t1.y.min(t2.y)..=t1.y.max(t2.y) {
-                    let p = Position::new(x, y);
-                    if !red_green.contains(&p) {
-                        continue 'outer;
-                    }
-                }
-            }
-            largest = largest.max(size);
-        }
-
-        Ok(largest)
+        Ok(self
+            .rectangles
+            .iter()
+            .find(|rect| self.polygon.contains(rect))
+            .ok_or(AoCError::BadInput)?
+            .size())
     }
 }
 
