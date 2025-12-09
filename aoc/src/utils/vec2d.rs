@@ -85,6 +85,15 @@ impl Display for Position {
     }
 }
 
+impl FromStr for Position {
+    type Err = AoCError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (x, y) = s.split_once(',').ok_or(AoCError::BadInput)?;
+        Ok(Position::new(x.parse()?, y.parse()?))
+    }
+}
+
 impl Add<Distance> for Position {
     type Output = Self;
 
