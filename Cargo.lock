@@ -166,6 +166,7 @@ dependencies = [
  "memoize 0.5.1",
  "nom 8.0.0",
  "pathfinding",
+ "rayon",
  "strum",
 ]
 

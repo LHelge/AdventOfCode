@@ -1,6 +1,6 @@
-use std::{collections::HashSet, str::FromStr};
-
 use aoc::{problem::*, utils::*, *};
+use rayon::prelude::*;
+use std::{collections::HashSet, str::FromStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Lights(Vec<bool>);
@@ -43,7 +43,7 @@ impl Lights {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-struct Joltages(Vec<u64>);
+struct Joltages(Vec<u16>);
 
 impl FromStr for Joltages {
     type Err = AoCError;
@@ -148,8 +148,6 @@ impl Machine {
         let mut states = HashSet::new();
         states.insert(Joltages::new(self.joltages.len()));
 
-        print!("Looking for presses for {self:?}: ");
-
         loop {
             presses += 1;
 
@@ -158,7 +156,7 @@ impl Machine {
                 for buttons in self.buttons.iter() {
                     let state = state.push(buttons);
                     if state == self.joltages {
-                        println!("{presses}");
+                        print!("Looking for presses for {self:?}: {presses}");
                         return presses;
                     }
                     new.push(state);
@@ -181,13 +179,17 @@ impl AoCProblem<usize, usize> for Problem {
     }
 
     fn part1(&self) -> Result<usize> {
-        Ok(self.machines.iter().map(|m| m.least_button_presses()).sum())
+        Ok(self
+            .machines
+            .par_iter()
+            .map(|m| m.least_button_presses())
+            .sum())
     }
 
     fn part2(&self) -> Result<usize> {
         Ok(self
             .machines
-            .iter()
+            .par_iter()
             .map(|m| m.least_button_presses2())
             .sum())
     }
