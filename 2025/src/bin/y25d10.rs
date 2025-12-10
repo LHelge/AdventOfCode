@@ -1,5 +1,5 @@
 use aoc::{problem::*, utils::*, *};
-use rayon::prelude::*;
+use microlp::{ComparisonOp, LinearExpr, OptimizationDirection, Problem as LpProblem};
 use std::{collections::HashSet, str::FromStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -12,11 +12,11 @@ impl FromStr for Lights {
         let lights = s[1..(s.len() - 1)]
             .chars()
             .map(|c| match c {
-                '.' => false,
-                '#' => true,
-                _ => panic!("HEEELP!"),
+                '.' => Ok(false),
+                '#' => Ok(true),
+                _ => Err(AoCError::BadInput),
             })
-            .collect();
+            .collect::<std::result::Result<Vec<bool>, AoCError>>()?;
 
         Ok(Lights(lights))
     }
@@ -42,55 +42,19 @@ impl Lights {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-struct Joltages(Vec<u16>);
-
-impl FromStr for Joltages {
-    type Err = AoCError;
-
-    fn from_str(s: &str) -> Result<Self> {
-        let joltages = s[1..(s.len() - 1)]
-            .split(',')
-            .map(|j| j.parse().unwrap())
-            .collect();
-
-        Ok(Joltages(joltages))
-    }
-}
-
-impl Joltages {
-    fn new(len: usize) -> Self {
-        Joltages(vec![0; len])
-    }
-
-    fn push(&self, buttons: &Vec<usize>) -> Self {
-        let mut new = self.clone();
-
-        for button in buttons {
-            new.0[*button] += 1;
-        }
-
-        new
-    }
-
-    fn len(&self) -> usize {
-        self.0.len()
-    }
-}
-
 #[derive(Debug)]
 struct Machine {
     lights: Lights,
     buttons: Vec<Vec<usize>>,
-    joltages: Joltages,
+    joltages: Vec<i32>,
 }
 
 impl FromStr for Machine {
     type Err = AoCError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         let mut buttons = Vec::new();
-        let mut joltages = Joltages::new(1);
+        let mut joltages = Vec::new();
 
         let (lights, rest) = s.split_once(' ').ok_or(AoCError::BadInput)?;
         let lights = lights.parse()?;
@@ -100,7 +64,7 @@ impl FromStr for Machine {
             if part.starts_with('(') {
                 buttons.push(middle.parse_delimited(',')?);
             } else if part.starts_with('{') {
-                joltages = part.parse()?;
+                joltages = middle.parse_delimited(',')?;
             }
         }
 
@@ -118,7 +82,7 @@ struct Problem {
 }
 
 impl Machine {
-    fn least_button_presses(&self) -> usize {
+    fn least_button_presses_lights(&self) -> usize {
         let mut presses = 0;
 
         let mut states = HashSet::new();
@@ -142,29 +106,34 @@ impl Machine {
         }
     }
 
-    fn least_button_presses2(&self) -> usize {
-        let mut presses = 0;
+    fn least_button_presses_joltage(&self) -> usize {
+        let mut problem = LpProblem::new(OptimizationDirection::Minimize);
+        let max = *self
+            .joltages
+            .iter()
+            .max()
+            .expect("Joltages should not be empty");
 
-        let mut states = HashSet::new();
-        states.insert(Joltages::new(self.joltages.len()));
+        let mut variables = Vec::new();
+        for _ in 0..self.buttons.len() {
+            variables.push(problem.add_integer_var(1.0, (0, max)));
+        }
 
-        loop {
-            presses += 1;
-
-            let mut new = Vec::new();
-            for state in states.iter() {
-                for buttons in self.buttons.iter() {
-                    let state = state.push(buttons);
-                    if state == self.joltages {
-                        print!("Looking for presses for {self:?}: {presses}");
-                        return presses;
-                    }
-                    new.push(state);
+        for (i, &joltage) in self.joltages.iter().enumerate() {
+            let mut expression = LinearExpr::empty();
+            for (btn, var) in self.buttons.iter().zip(variables.iter().copied()) {
+                if btn.contains(&i) {
+                    expression.add(var, 1.0);
                 }
             }
-
-            states.extend(new);
+            problem.add_constraint(expression, ComparisonOp::Eq, joltage.into());
         }
+
+        problem
+            .solve()
+            .expect("This should have a solution")
+            .objective()
+            .round() as usize
     }
 }
 
@@ -181,16 +150,16 @@ impl AoCProblem<usize, usize> for Problem {
     fn part1(&self) -> Result<usize> {
         Ok(self
             .machines
-            .par_iter()
-            .map(|m| m.least_button_presses())
+            .iter()
+            .map(|m| m.least_button_presses_lights())
             .sum())
     }
 
     fn part2(&self) -> Result<usize> {
         Ok(self
             .machines
-            .par_iter()
-            .map(|m| m.least_button_presses2())
+            .iter()
+            .map(|m| m.least_button_presses_joltage())
             .sum())
     }
 }
