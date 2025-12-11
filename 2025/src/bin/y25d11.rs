@@ -1,6 +1,5 @@
-use std::collections::{HashMap, HashSet};
-
 use aoc::{problem::*, *};
+use std::collections::HashMap;
 
 #[derive(Default)]
 struct Problem {
@@ -8,62 +7,20 @@ struct Problem {
 }
 
 impl Problem {
-    fn paths_to(&self, from: &str, to: &str, mut visited: HashSet<String>) -> usize {
+    fn paths_to(&self, from: &str, to: &str, cache: &mut HashMap<String, usize>) -> usize {
         if from == to {
             return 1;
         }
-        if visited.contains(from) {
+        if let Some(paths) = cache.get(from) {
+            return *paths;
+        }
+
+        let Some(next) = self.devices.get(from) else {
             return 0;
-        }
-        visited.insert(from.to_owned());
+        };
 
-        self.devices
-            .get(from)
-            .unwrap()
-            .iter()
-            .map(|out| self.paths_to(out, to, visited.clone()))
-            .sum()
-    }
-
-    fn paths_to2(
-        &self,
-        from: &str,
-        to: &str,
-        mut visited: HashSet<String>,
-        cache: &mut HashMap<String, usize>,
-    ) -> usize {
-        if from == to {
-            print!("Found path through: {:?}", visited);
-            return if visited.contains("fft") && visited.contains("dac") {
-                println!("Visited dac & fft");
-                1
-            } else {
-                println!("Did not visit dac & fft");
-                0
-            };
-        }
-
-        //if visited.contains(from) && !visited.contains("fft") && !visited.contains("dac") {
-        //    return 0;
-        //}
-        visited.insert(from.to_owned());
-        print!("{from} ->");
-
-        let paths = self
-            .devices
-            .get(from)
-            .unwrap()
-            .iter()
-            .map(|out| {
-                if let Some(paths) = cache.get(out) {
-                    println!("Cache hit on {out}={paths}");
-                    return *paths;
-                };
-                self.paths_to2(out, to, visited.clone(), cache)
-            })
-            .sum();
-
-        cache.insert(to.to_owned(), paths);
+        let paths = next.iter().map(|out| self.paths_to(out, to, cache)).sum();
+        cache.insert(from.to_owned(), paths);
 
         paths
     }
@@ -87,12 +44,21 @@ impl AoCProblem<usize, usize> for Problem {
     }
 
     fn part1(&self) -> Result<usize> {
-        Ok(self.paths_to("you", "out", HashSet::new()))
+        Ok(self.paths_to("you", "out", &mut HashMap::new()))
     }
 
     fn part2(&self) -> Result<usize> {
-        let mut cache = HashMap::new();
-        Ok(self.paths_to2("svr", "out", HashSet::new(), &mut cache))
+        let svr_fft = self.paths_to("svr", "fft", &mut HashMap::new());
+        let fft_dac = self.paths_to("fft", "dac", &mut HashMap::new());
+        let dac_out = self.paths_to("dac", "out", &mut HashMap::new());
+        let svr_fft_dac = svr_fft * fft_dac * dac_out;
+
+        let svr_dac = self.paths_to("svr", "dac", &mut HashMap::new());
+        let dac_fft = self.paths_to("dac", "fft", &mut HashMap::new());
+        let fft_out = self.paths_to("fft", "out", &mut HashMap::new());
+        let svr_dac_fft = svr_dac * dac_fft * fft_out;
+
+        Ok(svr_fft_dac + svr_dac_fft)
     }
 }
 
