@@ -8,8 +8,8 @@ For [AoC 2025](https://adventofcode.com/2025/) the number of problems has been r
 - [Day 5](src/bin/y25d05.rs) - [Cafeteria](https://adventofcode.com/2025/day/5)
 - [Day 6](src/bin/y25d06.rs) - [Trash Compactor](https://adventofcode.com/2025/day/6)
 - [Day 7](src/bin/y25d07.rs) - [Laboratories](https://adventofcode.com/2025/day/7)
-- Day 8
-- Day 9
-- Day 10
-- Day 11
-- Day 12
+- [Day 8](src/bin/y25d08.rs) - [Playground](https://adventofcode.com/2025/day/8)
+- [Day 9](src/bin/y25d09.rs) - [Movie Theater](https://adventofcode.com/2025/day/9)
+- [Day 10](src/bin/y25d10.rs) - [Factory](https://adventofcode.com/2025/day/10)
+- [Day 11](src/bin/y25d11.rs) - [Reactor](https://adventofcode.com/2025/day/11)
+- [Day 12](src/bin/y25d12.rs) - [Christmas Tree Farm](https://adventofcode.com/2025/day/12)
