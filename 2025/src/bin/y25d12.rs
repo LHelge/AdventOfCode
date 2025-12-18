@@ -2,32 +2,21 @@ use aoc::{problem::*, utils::*, *};
 use std::str::FromStr;
 
 #[derive(Debug)]
-struct Present(Vec2d<bool>);
+struct Present(usize);
 
 impl FromStr for Present {
     type Err = AoCError;
 
     fn from_str(s: &str) -> Result<Self> {
-        let data = s
-            .lines()
-            .map(|line| {
-                line.chars()
-                    .map(|c| match c {
-                        '.' => false,
-                        '#' => true,
-                        _ => panic!("Heeelp!"),
-                    })
-                    .collect()
-            })
-            .collect();
+        let size = s.chars().filter(|c| *c == '#').count();
 
-        Ok(Present(Vec2d::new(data)?))
+        Ok(Present(size))
     }
 }
 
 impl Present {
-    fn num_set(&self) -> usize {
-        self.0.iter().filter(|(_, set)| **set).count()
+    fn size_compressed(&self) -> usize {
+        self.0
     }
 }
 
@@ -59,7 +48,7 @@ impl Region {
             .presents
             .iter()
             .zip(presents)
-            .map(|(num, pres)| num * pres.num_set())
+            .map(|(num, pres)| num * pres.size_compressed())
             .sum();
 
         sum < area
