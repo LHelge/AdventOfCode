@@ -68,7 +68,7 @@ impl AoCProblem<u64, u64> for Problem {
         let operations = lines
             .last()
             .ok_or(AoCError::BadInput)?
-            .parse_whitespace_delilited()?;
+            .parse_whitespace_delimited()?;
 
         self.problems = operations.iter().map(|op| MathProblem::new(*op)).collect();
 
