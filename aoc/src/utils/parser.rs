@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 pub trait Parser<T> {
     fn parse_delimited(&self, delimiter: char) -> Result<Vec<T>>;
-    fn parse_whitespace_delilited(&self) -> Result<Vec<T>>;
+    fn parse_whitespace_delimited(&self) -> Result<Vec<T>>;
     fn parse_lines(&self) -> Result<Vec<T>>;
 }
 
@@ -18,7 +18,7 @@ where
             .collect()
     }
 
-    fn parse_whitespace_delilited(&self) -> Result<Vec<T>> {
+    fn parse_whitespace_delimited(&self) -> Result<Vec<T>> {
         self.split_whitespace()
             .map(|s| s.parse().map_err(Into::into))
             .collect()
