@@ -19,11 +19,7 @@ fn solve_task(input: &str) -> (u32, u32) {
         .fold(
             0,
             |acc, (a, b)| {
-                if a == b {
-                    acc + (a - b'0') as u32
-                } else {
-                    acc
-                }
+                if a == b { acc + (a - b'0') as u32 } else { acc }
             },
         );
 

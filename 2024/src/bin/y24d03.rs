@@ -2,11 +2,11 @@ const YEAR: u16 = 2024;
 const DAY: u8 = 3;
 use aoc::*;
 use nom::{
+    Finish, IResult, Parser,
     branch::alt,
     bytes::complete::tag,
     character::complete::anychar,
-    multi::{many1, many_till},
-    Finish, IResult, Parser,
+    multi::{many_till, many1},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -35,7 +35,7 @@ impl Display for ParsingStatus {
     }
 }
 
-pub type Parser<R> = dyn Fn(&str) -> Result<R>;
+pub type ParserFn<R> = dyn Fn(&str) -> Result<R>;
 pub type Solver<T, R> = dyn Fn(&R) -> Result<T>;
 
 pub struct Solution<'a, T, R>
@@ -43,7 +43,7 @@ where
     T: Display,
     T: Copy,
 {
-    parser: &'a Parser<R>,
+    parser: &'a ParserFn<R>,
     task1_solver: &'a Solver<T, R>,
     task2_solver: &'a Solver<T, R>,
     parse: ParsingStatus,
@@ -56,7 +56,7 @@ where
     T: Display,
     T: Copy,
 {
-    pub fn new(parser: &'a Parser<R>, task1: &'a Solver<T, R>, task2: &'a Solver<T, R>) -> Self {
+    pub fn new(parser: &'a ParserFn<R>, task1: &'a Solver<T, R>, task2: &'a Solver<T, R>) -> Self {
         Self {
             parser,
             task1_solver: task1,
