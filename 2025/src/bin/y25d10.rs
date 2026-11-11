@@ -132,6 +132,8 @@ impl Machine {
         problem
             .solve()
             .expect("This should have a solution")
+            .into_solution()
+            .expect("Solve should not be interrupted")
             .objective()
             .round() as usize
     }
