@@ -3,6 +3,7 @@ const DAY: u8 = 14;
 
 use aoc::*;
 use itertools::Itertools;
+use nom::Parser as _;
 use nom::{
     IResult,
     bytes::complete::tag,
@@ -38,7 +39,8 @@ fn position(input: &str) -> IResult<&str, Position> {
     let (input, (x, y)) = preceded(
         tag("p="),
         separated_pair(complete::i64, tag(","), complete::i64),
-    )(input)?;
+    )
+    .parse(input)?;
     Ok((input, Position { x, y }))
 }
 
@@ -46,12 +48,13 @@ fn velocity(input: &str) -> IResult<&str, Velocity> {
     let (input, (x, y)) = preceded(
         tag("v="),
         separated_pair(complete::i64, tag(","), complete::i64),
-    )(input)?;
+    )
+    .parse(input)?;
     Ok((input, Velocity { x, y }))
 }
 
 fn robot(input: &str) -> IResult<&str, Robot> {
-    let (input, (position, velocity)) = separated_pair(position, space1, velocity)(input)?;
+    let (input, (position, velocity)) = separated_pair(position, space1, velocity).parse(input)?;
     Ok((input, Robot { position, velocity }))
 }
 
@@ -86,7 +89,9 @@ type ResultType = usize;
 type DataType = (Room, Vec<Robot>);
 
 fn parse(input: &str) -> Result<DataType> {
-    let (_, robots) = separated_list1(newline, robot)(input).map_err(|_| AoCError::BadInput)?;
+    let (_, robots) = separated_list1(newline, robot)
+        .parse(input)
+        .map_err(|_| AoCError::BadInput)?;
 
     // Ugly hack, but room is smaller for tests
     let room = if cfg!(test) {

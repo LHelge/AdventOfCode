@@ -2,6 +2,7 @@ const YEAR: u16 = 2023;
 const DAY: u8 = 13;
 
 use aoc::{utils::*, *};
+use nom::Parser as _;
 use nom::{
     IResult,
     character::complete::{line_ending, one_of},
@@ -128,7 +129,7 @@ fn toggle(m: &mut Material) {
 }
 
 fn pattern(input: &str) -> IResult<&str, Pattern> {
-    let (input, rows) = separated_list1(line_ending, many1(one_of("#.")))(input)?;
+    let (input, rows) = separated_list1(line_ending, many1(one_of("#."))).parse(input)?;
     let data = rows
         .iter()
         .map(|row| row.iter().map(|&c| c.try_into().unwrap()).collect())
@@ -143,8 +144,9 @@ type ResultType = usize;
 type DataType = Vec<Pattern>;
 
 fn parse(input: &str) -> Result<DataType> {
-    let (_, patterns) =
-        separated_list1(many1(line_ending), pattern)(input).map_err(|_| AoCError::BadInput)?;
+    let (_, patterns) = separated_list1(many1(line_ending), pattern)
+        .parse(input)
+        .map_err(|_| AoCError::BadInput)?;
     Ok(patterns)
 }
 

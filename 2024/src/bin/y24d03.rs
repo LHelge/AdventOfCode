@@ -17,7 +17,7 @@ enum Instruction {
 }
 
 fn instruction(input: &str) -> IResult<&str, Instruction> {
-    alt((mul_instruction, do_instruction, dont_instruction))(input)
+    alt((mul_instruction, do_instruction, dont_instruction)).parse(input)
 }
 
 fn mul_instruction(input: &str) -> IResult<&str, Instruction> {
@@ -44,7 +44,9 @@ type ResultType = u64;
 type DataType = Vec<Instruction>;
 
 fn parse(input: &str) -> Result<DataType> {
-    let (_, data) = many1(many_till(anychar, instruction).map(|(_, i)| i))(input).finish()?;
+    let (_, data) = many1(many_till(anychar, instruction).map(|(_, i)| i))
+        .parse(input)
+        .finish()?;
 
     Ok(data)
 }
@@ -117,7 +119,7 @@ mod tests {
         assert_eq!(result, Ok(("", Instruction::Dont)));
 
         let input = "mul(2,4)do()don't()";
-        let result = many1(instruction)(input);
+        let result = many1(instruction).parse(input);
         assert_eq!(
             result,
             Ok((

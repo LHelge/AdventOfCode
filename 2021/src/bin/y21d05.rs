@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use aoc::AoCInput;
+use nom::Parser as _;
 use nom::{
     IResult,
     bytes::complete::tag,
@@ -17,16 +18,17 @@ fn point(input: &str) -> IResult<&str, Point> {
         nom::character::complete::u64,
         nom::character::complete::char(','),
         nom::character::complete::u64,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn line(input: &str) -> IResult<&str, Line> {
     let (input, _) = multispace0(input)?;
-    separated_pair(point, tag(" -> "), point)(input)
+    separated_pair(point, tag(" -> "), point).parse(input)
 }
 
 fn parse_lines(input: &str) -> IResult<&str, Vec<Line>> {
-    separated_list0(line_ending, line)(input)
+    separated_list0(line_ending, line).parse(input)
 }
 
 #[allow(clippy::reversed_empty_ranges)]

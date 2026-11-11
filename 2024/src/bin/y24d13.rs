@@ -2,6 +2,7 @@ const YEAR: u16 = 2024;
 const DAY: u8 = 13;
 
 use aoc::*;
+use nom::Parser as _;
 use nom::{
     IResult,
     bytes::complete::tag,
@@ -109,8 +110,9 @@ type ResultType = u64;
 type DataType = Vec<ClawMachine>;
 
 fn parse(input: &str) -> Result<DataType> {
-    let (_, machines) =
-        separated_list1(many1(newline), claw_machine)(input).map_err(|_| AoCError::BadInput)?;
+    let (_, machines) = separated_list1(many1(newline), claw_machine)
+        .parse(input)
+        .map_err(|_| AoCError::BadInput)?;
     Ok(machines)
 }
 
