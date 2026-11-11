@@ -6,5 +6,5 @@ edition = "2024"
 
 [dependencies]
 aoc = { path = "../aoc" }
-microlp = "0.2.11"
-strum = "0.26.3"
+microlp = "0.7.0"
+strum = "0.28.0"

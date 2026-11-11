@@ -112,12 +112,10 @@ impl Warehouse {
                 self.map.swap(self.robot, new_pos).unwrap();
                 self.robot = new_pos;
             }
-            Some(tile) if tile.is_box() => {
-                if self.can_be_pushed(new_pos, direction) {
-                    self.push_box(new_pos, direction);
-                    self.map.swap(self.robot, new_pos).unwrap();
-                    self.robot = new_pos;
-                }
+            Some(tile) if tile.is_box() && self.can_be_pushed(new_pos, direction) => {
+                self.push_box(new_pos, direction);
+                self.map.swap(self.robot, new_pos).unwrap();
+                self.robot = new_pos;
             }
 
             _ => {}

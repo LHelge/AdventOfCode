@@ -3,10 +3,10 @@ const DAY: u8 = 13;
 
 use aoc::*;
 use nom::{
+    IResult,
     bytes::complete::tag,
     character::complete::newline,
     multi::{many1, separated_list1},
-    IResult,
 };
 
 trait IsAlmostInt {

@@ -88,11 +88,7 @@ fn solve_task(input: &str) -> (usize, usize) {
     let task2 = sizes.values().fold(
         usize::MAX,
         |acc, &s| {
-            if s >= to_delete && s < acc {
-                s
-            } else {
-                acc
-            }
+            if s >= to_delete && s < acc { s } else { acc }
         },
     );
 

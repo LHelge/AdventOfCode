@@ -4,11 +4,11 @@ const DAY: u8 = 14;
 use aoc::*;
 use itertools::Itertools;
 use nom::{
+    IResult,
     bytes::complete::tag,
     character::complete::{self, newline, space1},
     multi::separated_list1,
     sequence::{preceded, separated_pair},
-    IResult,
 };
 
 struct Room {

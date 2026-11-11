@@ -6,4 +6,4 @@ edition = "2024"
 
 [dependencies]
 aoc = { path = "../aoc" }
-md5 = "0.7.0"
+md5 = "0.8.1"

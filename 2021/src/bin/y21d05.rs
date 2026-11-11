@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use aoc::AoCInput;
 use nom::{
+    IResult,
     bytes::complete::tag,
     character::complete::{line_ending, multispace0},
     multi::separated_list0,
     sequence::separated_pair,
-    IResult,
 };
 
 type Point = (u64, u64);
@@ -61,7 +61,7 @@ fn solve_task(input: &str) -> (u64, u64) {
             _ => (0, 0, 0),
         };
 
-        let (mut x, mut y) = (line.0 .0 as i64, line.0 .1 as i64);
+        let (mut x, mut y) = (line.0.0 as i64, line.0.1 as i64);
         for _ in 0..num {
             points
                 .entry((x as u64, y as u64))
