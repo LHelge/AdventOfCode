@@ -94,7 +94,7 @@ impl AoCProblem<usize, usize> for Problem {
 
         self.rectangles = tiles
             .pairs()
-            .map(|(p1, p2)| Rectangle::new(p1, p2))
+            .map(|(p1, p2)| Rectangle::new(*p1, *p2))
             .collect();
         self.rectangles.sort_by_key(|r| r.size());
         self.rectangles.reverse();

@@ -101,7 +101,8 @@ impl AoCProblem<usize, i64> for Problem {
 
         self.distances.clear();
         for (b1, b2) in self.boxes.pairs() {
-            self.distances.insert(b1.distance_to_squared(&b2), (b1, b2));
+            self.distances
+                .insert(b1.distance_to_squared(b2), (*b1, *b2));
         }
 
         Ok(())
