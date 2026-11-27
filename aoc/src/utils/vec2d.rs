@@ -383,8 +383,8 @@ impl<T> Vec2d<T> {
         let mut transposed = Vec::with_capacity(self.width());
         for x in 0..self.width() {
             let mut row = Vec::with_capacity(self.height());
-            for y in 0..self.height() {
-                row.push(self.data[y][x].clone());
+            for r in self.data.iter() {
+                row.push(r[x].clone());
             }
             transposed.push(row);
         }
