@@ -19,7 +19,7 @@ fn main() -> Result<()> {
     let workspace_root = xtask_root.ancestors().nth(1).unwrap();
 
     let (year, day) = match (args.year, args.day) {
-        (y @ 2025, d @ 1..=12) => Ok((y, d)),
+        (y @ 2025..=2026, d @ 1..=12) => Ok((y, d)),
         (y @ 2015..=2024, d @ 1..=25) => Ok((y, d)),
         (y, d) => Err(Error::InvalidDay(y, d)),
     }?;
@@ -82,7 +82,7 @@ impl DayTemplate {
 
 fn new_day(workspace_root: &Path, year: u16, day: u8) -> Result<()> {
     match (year, day) {
-        (2025, 1..=12) => Ok(()),
+        (2025..=2026, 1..=12) => Ok(()),
         (2015..=2024, 1..=25) => Ok(()),
         (year, day) => Err(Error::InvalidDay(year, day)),
     }?;

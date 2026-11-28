@@ -19,7 +19,7 @@ impl Display for Date {
 impl Date {
     pub fn new(year: u16, day: u8) -> Result<Self> {
         match (year, day) {
-            (2025, 1..=12) => Ok(Self { year, day }),
+            (2025..=2026, 1..=12) => Ok(Self { year, day }),
             (2015..=2024, 1..=25) => Ok(Self { year, day }),
             _ => Err(AoCError::InvalidDay(year, day)),
         }
