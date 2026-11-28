@@ -6,3 +6,6 @@ edition = "2024"
 
 [dependencies]
 aoc = { path = "../aoc" }
+itertools = "0.15.0"
+jiff = "1.0.3"
+nom = "8.0.0"
