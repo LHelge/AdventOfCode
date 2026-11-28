@@ -22,19 +22,21 @@ impl TryFrom<char> for Entry {
     }
 }
 
-#[derive(Default)]
 struct Problem {
     diagram: Vec2d<Entry>,
 }
 
-impl AoCProblem<usize, usize> for Problem {
-    fn date() -> Date {
-        Date::new(2025, 7).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = usize;
+    type Solution2 = usize;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
-        self.diagram = input.parse()?;
-        Ok(())
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 7;
+
+    fn parse(input: &str) -> Result<Self> {
+        Ok(Self {
+            diagram: input.parse()?,
+        })
     }
 
     fn part1(&self) -> Result<usize> {
@@ -104,12 +106,7 @@ fn count_timelines(
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -117,7 +114,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#".......S.......
 ...............
 .......^.......
@@ -135,9 +132,10 @@ mod tests {
 .^.^.^.^.^...^.
 ..............."#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(21);
-        problem.test_part2(40);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 21);
+        assert_eq!(problem.part2()?, 40);
+
+        Ok(())
     }
 }

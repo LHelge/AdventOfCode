@@ -25,24 +25,21 @@ impl Id {
     }
 }
 
-#[derive(Default)]
 struct Problem {
     boxes: Vec<Id>,
 }
 
-impl AoCProblem<usize, String> for Problem {
-    fn date() -> Date {
-        Date::new(2018, 2).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = usize;
+    type Solution2 = String;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
-        self.boxes.clear();
+    const YEAR: u16 = 2018;
+    const DAY: u8 = 2;
 
-        for line in input.lines() {
-            self.boxes.push(Id(line.into()));
-        }
-
-        Ok(())
+    fn parse(input: &str) -> Result<Self> {
+        Ok(Self {
+            boxes: input.lines().map(|line| Id(line.into())).collect(),
+        })
     }
 
     fn part1(&self) -> Result<usize> {
@@ -61,12 +58,7 @@ impl AoCProblem<usize, String> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -74,7 +66,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"abcdef
 bababc
 abbcde
@@ -83,9 +75,8 @@ aabcdd
 abcdee
 ababab"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(12);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 12);
 
         let input = r#"abcde
 fghij
@@ -95,7 +86,9 @@ fguij
 axcye
 wvxyz"#;
 
-        problem.parse(input).unwrap();
-        problem.test_part2(String::from("fgij"));
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part2()?, String::from("fgij"));
+
+        Ok(())
     }
 }

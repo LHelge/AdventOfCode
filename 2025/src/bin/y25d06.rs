@@ -46,33 +46,33 @@ impl MathProblem {
     }
 }
 
-#[derive(Default)]
 struct Problem {
     lines: Vec<String>,
     problems: Vec<MathProblem>,
 }
 
-impl AoCProblem<u64, u64> for Problem {
-    fn date() -> Date {
-        Date::new(2025, 6).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = u64;
+    type Solution2 = u64;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 6;
+
+    fn parse(input: &str) -> Result<Self> {
         let lines: Vec<&str> = input.lines().collect();
 
-        self.lines = lines[..(lines.len() - 1)]
-            .iter()
-            .map(|&s| s.to_owned())
-            .collect();
-
-        let operations = lines
+        let operations: Vec<_> = lines
             .last()
             .ok_or(AoCError::BadInput)?
             .parse_whitespace_delimited()?;
 
-        self.problems = operations.iter().map(|op| MathProblem::new(*op)).collect();
-
-        Ok(())
+        Ok(Self {
+            lines: lines[..(lines.len() - 1)]
+                .iter()
+                .map(|&s| s.to_owned())
+                .collect(),
+            problems: operations.iter().map(|op| MathProblem::new(*op)).collect(),
+        })
     }
 
     fn part1(&self) -> Result<u64> {
@@ -108,12 +108,7 @@ impl AoCProblem<u64, u64> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -121,15 +116,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"123 328  51 64 
  45 64  387 23 
   6 98  215 314
 *   +   *   +  "#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(4277556);
-        problem.test_part2(3263827);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 4277556);
+        assert_eq!(problem.part2()?, 3263827);
+
+        Ok(())
     }
 }

@@ -1,14 +1,15 @@
 use aoc::{problem::*, utils::*, *};
 
-#[derive(Default)]
 struct Problem {}
 
-impl AoCProblem<u64, u64> for Problem {
-    fn date() -> Date {
-        Date::new({{ year }}, {{ day }}).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = u64;
+    type Solution2 = u64;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
+    const YEAR: u16 = {{ year }};
+    const DAY: u8 = {{ day }};
+
+    fn parse(input: &str) -> Result<Self> {
         Err(AoCError::Unsolved)
     }
 
@@ -18,12 +19,7 @@ impl AoCProblem<u64, u64> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -31,11 +27,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#""#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(0);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 0);
+
+        Ok(())
     }
 }

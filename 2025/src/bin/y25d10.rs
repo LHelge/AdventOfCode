@@ -76,7 +76,6 @@ impl FromStr for Machine {
     }
 }
 
-#[derive(Default)]
 struct Problem {
     machines: Vec<Machine>,
 }
@@ -139,14 +138,17 @@ impl Machine {
     }
 }
 
-impl AoCProblem<usize, usize> for Problem {
-    fn date() -> Date {
-        Date::new(2025, 10).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = usize;
+    type Solution2 = usize;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
-        self.machines = input.parse_lines()?;
-        Ok(())
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 10;
+
+    fn parse(input: &str) -> Result<Self> {
+        Ok(Self {
+            machines: input.parse_lines()?,
+        })
     }
 
     fn part1(&self) -> Result<usize> {
@@ -167,12 +169,7 @@ impl AoCProblem<usize, usize> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -180,14 +177,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
 [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
 [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(7);
-        problem.test_part2(33);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 7);
+        assert_eq!(problem.part2()?, 33);
+
+        Ok(())
     }
 }

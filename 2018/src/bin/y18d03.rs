@@ -47,7 +47,6 @@ fn claim(input: &str) -> IResult<&str, Claim> {
     Ok((input, Claim { id, rect }))
 }
 
-#[derive(Default)]
 struct Problem {
     claims: Vec<Claim>,
 }
@@ -62,17 +61,18 @@ impl Problem {
     }
 }
 
-impl AoCProblem<u64, u64> for Problem {
-    fn date() -> Date {
-        Date::new(2018, 3).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = u64;
+    type Solution2 = u64;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
+    const YEAR: u16 = 2018;
+    const DAY: u8 = 3;
+
+    fn parse(input: &str) -> Result<Self> {
         let (_, claims) = separated_list1(line_ending, claim)
             .parse(input)
             .map_err(|_| AoCError::BadInput)?;
-        self.claims = claims;
-        Ok(())
+        Ok(Self { claims })
     }
 
     fn part1(&self) -> Result<u64> {
@@ -103,12 +103,7 @@ impl AoCProblem<u64, u64> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -116,14 +111,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"#1 @ 1,3: 4x4
 #2 @ 3,1: 4x4
 #3 @ 5,5: 2x2"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(4);
-        problem.test_part2(3);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 4);
+        assert_eq!(problem.part2()?, 3);
+
+        Ok(())
     }
 }

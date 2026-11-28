@@ -85,27 +85,27 @@ impl Circuits {
     }
 }
 
-#[derive(Default)]
 struct Problem {
     boxes: Vec<JunctionBox>,
     distances: BTreeMap<i64, (JunctionBox, JunctionBox)>,
 }
 
-impl AoCProblem<usize, i64> for Problem {
-    fn date() -> Date {
-        Date::new(2025, 8).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = usize;
+    type Solution2 = i64;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
-        self.boxes = input.parse_lines()?;
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 8;
 
-        self.distances.clear();
-        for (b1, b2) in self.boxes.pairs() {
-            self.distances
-                .insert(b1.distance_to_squared(b2), (*b1, *b2));
-        }
+    fn parse(input: &str) -> Result<Self> {
+        let boxes: Vec<JunctionBox> = input.parse_lines()?;
 
-        Ok(())
+        let distances = boxes
+            .pairs()
+            .map(|(b1, b2)| (b1.distance_to_squared(b2), (*b1, *b2)))
+            .collect();
+
+        Ok(Self { boxes, distances })
     }
 
     fn part1(&self) -> Result<usize> {
@@ -141,12 +141,7 @@ impl AoCProblem<usize, i64> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -154,7 +149,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"162,817,812
 57,618,57
 906,360,560
@@ -176,9 +171,10 @@ mod tests {
 984,92,344
 425,690,689"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(40);
-        problem.test_part2(25272);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 40);
+        assert_eq!(problem.part2()?, 25272);
+
+        Ok(())
     }
 }

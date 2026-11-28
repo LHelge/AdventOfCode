@@ -94,22 +94,23 @@ fn event(input: &str) -> IResult<&str, Event> {
     Ok((input, Event { time, _type }))
 }
 
-#[derive(Default)]
 struct Problem {
     events: BTreeSet<Event>,
 }
 
-impl AoCProblem<u64, u64> for Problem {
-    fn date() -> Date {
-        Date::new(2018, 4).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = u64;
+    type Solution2 = u64;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
+    const YEAR: u16 = 2018;
+    const DAY: u8 = 4;
+
+    fn parse(input: &str) -> Result<Self> {
         let (_, events) = separated_list1(line_ending, event).parse(input).unwrap();
 
-        self.events = events.into_iter().collect();
-
-        Ok(())
+        Ok(Self {
+            events: events.into_iter().collect(),
+        })
     }
 
     fn part1(&self) -> Result<u64> {
@@ -135,12 +136,7 @@ impl AoCProblem<u64, u64> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -148,7 +144,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"[1518-11-01 00:00] Guard #10 begins shift
 [1518-11-01 00:05] falls asleep
 [1518-11-01 00:25] wakes up
@@ -167,8 +163,9 @@ mod tests {
 [1518-11-05 00:45] falls asleep
 [1518-11-05 00:55] wakes up"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(240);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 240);
+
+        Ok(())
     }
 }

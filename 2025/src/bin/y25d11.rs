@@ -1,7 +1,6 @@
 use aoc::{problem::*, *};
 use std::collections::HashMap;
 
-#[derive(Default)]
 struct Problem {
     devices: HashMap<String, Vec<String>>,
 }
@@ -26,13 +25,15 @@ impl Problem {
     }
 }
 
-impl AoCProblem<usize, usize> for Problem {
-    fn date() -> Date {
-        Date::new(2025, 11).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = usize;
+    type Solution2 = usize;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
-        self.devices = input
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 11;
+
+    fn parse(input: &str) -> Result<Self> {
+        let devices = input
             .lines()
             .map(|line| {
                 let (device, outputs) = line.split_once(": ").unwrap();
@@ -40,7 +41,7 @@ impl AoCProblem<usize, usize> for Problem {
                 (device.to_owned(), outputs)
             })
             .collect();
-        Ok(())
+        Ok(Self { devices })
     }
 
     fn part1(&self) -> Result<usize> {
@@ -63,12 +64,7 @@ impl AoCProblem<usize, usize> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -76,7 +72,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn examples1() {
+    fn examples1() -> Result<()> {
         let input = r#"aaa: you hhh
 you: bbb ccc
 bbb: ddd eee
@@ -88,13 +84,14 @@ ggg: out
 hhh: ccc fff iii
 iii: out"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(5);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 5);
+
+        Ok(())
     }
 
     #[test]
-    fn examples2() {
+    fn examples2() -> Result<()> {
         let input = r#"svr: aaa bbb
 aaa: fft
 fft: ccc
@@ -109,8 +106,9 @@ fff: ggg hhh
 ggg: out
 hhh: out"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part2(2);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part2()?, 2);
+
+        Ok(())
     }
 }

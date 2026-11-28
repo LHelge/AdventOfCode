@@ -55,30 +55,33 @@ impl Region {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 struct Problem {
     presents: Vec<Present>,
     regions: Vec<Region>,
 }
 
-impl AoCProblem<usize, usize> for Problem {
-    fn date() -> Date {
-        Date::new(2025, 12).unwrap()
-    }
+impl AoCProblem for Problem {
+    type Solution1 = usize;
+    type Solution2 = usize;
 
-    fn parse(&mut self, input: &str) -> Result<()> {
-        self.presents.clear();
+    const YEAR: u16 = 2025;
+    const DAY: u8 = 12;
+
+    fn parse(input: &str) -> Result<Self> {
+        let mut presents = Vec::new();
+        let mut regions = Vec::new();
 
         for (i, part) in input.split("\n\n").enumerate() {
             let header = format!("{i}:\n");
             if let Some(present) = part.strip_prefix(&header) {
-                self.presents.push(present.parse()?);
+                presents.push(present.parse()?);
             } else {
-                self.regions = part.parse_lines()?;
+                regions = part.parse_lines()?;
             }
         }
 
-        Ok(())
+        Ok(Self { presents, regions })
     }
 
     fn part1(&self) -> Result<usize> {
@@ -91,12 +94,7 @@ impl AoCProblem<usize, usize> for Problem {
 }
 
 fn main() -> Result<()> {
-    let mut problem = Problem::default();
-    let solution = problem.solve()?;
-
-    println!("{solution}");
-
-    Ok(())
+    Problem::run()
 }
 
 #[cfg(test)]
@@ -105,7 +103,7 @@ mod tests {
 
     #[ignore = "This day's test input was just trolling."]
     #[test]
-    fn examples() {
+    fn examples() -> Result<()> {
         let input = r#"0:
 ###
 ##.
@@ -140,8 +138,9 @@ mod tests {
 12x5: 1 0 1 0 2 2
 12x5: 1 0 1 0 3 2"#;
 
-        let mut problem = Problem::default();
-        problem.parse(input).unwrap();
-        problem.test_part1(2);
+        let problem = Problem::parse(input)?;
+        assert_eq!(problem.part1()?, 2);
+
+        Ok(())
     }
 }
